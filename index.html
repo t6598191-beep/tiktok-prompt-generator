@@ -37,11 +37,9 @@ body{background:#0a0a0f;color:#f5f5f7;font-family:-apple-system,BlinkMacSystemFo
 .img-slot-label{font-size:10px;font-weight:600;color:#999;display:block;margin-bottom:4px}
 .img-slot-label .badge{color:#ffa502;font-size:9px}
 
-/* Static upload area using label+input */
-.upload-wrap{position:relative;width:100%;height:100px;border-radius:10px;overflow:hidden}
-.upload-label{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100px;background:rgba(255,255,255,0.04);border:2px dashed rgba(255,255,255,0.15);border-radius:10px;color:#888;font-size:22px;cursor:pointer}
-.upload-label span{font-size:10px;color:#666;margin-top:2px}
-.upload-label input{position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:100px}
+/* Simple file input - no hiding tricks, Safari-safe */
+.file-input{display:block;width:100%;padding:12px 8px;background:rgba(255,255,255,0.04);border:2px dashed rgba(255,255,255,0.15);border-radius:10px;color:#888;font-size:12px;cursor:pointer}
+.file-input::-webkit-file-upload-button{background:rgba(255,255,255,0.1);color:#ccc;border:1px solid rgba(255,255,255,0.2);border-radius:6px;padding:6px 12px;font-size:11px;cursor:pointer;margin-right:8px}
 
 .img-prev{position:relative;width:100%;height:100px;border-radius:10px;overflow:hidden;border:1px solid rgba(255,107,107,0.3);display:none}
 .img-prev img{width:100%;height:100%;object-fit:cover}
@@ -123,13 +121,7 @@ input[type=text],select{width:100%;padding:10px 12px;background:rgba(255,255,255
     <!-- Influencer image -->
     <div class="img-slot">
       <div class="img-slot-label">👩 インフルエンサー <span class="badge" id="inf-badge"></span></div>
-      <div class="upload-wrap" id="inf-upload">
-        <label class="upload-label">
-          👩
-          <span>タップして選択</span>
-          <input type="file" accept="image/*" id="inf-file" onchange="handleFile(event,'inf')">
-        </label>
-      </div>
+      <input type="file" accept="image/*" class="file-input" id="inf-file" onchange="handleFile(this.files,'inf')">
       <div class="img-prev" id="inf-prev">
         <img id="inf-img" src="" alt="">
         <button type="button" class="img-del" onclick="clearInf()">✕</button>
@@ -138,13 +130,7 @@ input[type=text],select{width:100%;padding:10px 12px;background:rgba(255,255,255
     <!-- Product image -->
     <div class="img-slot">
       <div class="img-slot-label">📦 商品画像</div>
-      <div class="upload-wrap" id="prod-upload">
-        <label class="upload-label">
-          📦
-          <span>タップして選択</span>
-          <input type="file" accept="image/*" id="prod-file" onchange="handleFile(event,'prod')">
-        </label>
-      </div>
+      <input type="file" accept="image/*" class="file-input" id="prod-file" onchange="handleFile(this.files,'prod')">
       <div class="img-prev" id="prod-prev">
         <img id="prod-img" src="" alt="">
         <button type="button" class="img-del" onclick="clearProd()">✕</button>
@@ -302,31 +288,23 @@ function fileToBase64(file,cb){
   r.readAsDataURL(file);
 }
 
-function handleFile(evt,type){
-  alert('DEBUG1: handleFile呼ばれた type='+type);
-  var input=evt.target;
-  if(!input||!input.files||input.files.length===0){alert('DEBUG2: ファイルなし');return;}
-  var f=input.files[0];
-  if(!f){alert('DEBUG3: files[0]なし');return;}
-  alert('DEBUG4: ファイル取得OK name='+f.name+' size='+f.size);
+function handleFile(files,type){
+  if(!files||files.length===0)return;
+  var f=files[0];
+  if(!f)return;
 
-  try{
-    var blobUrl=window.URL.createObjectURL(f);
-    alert('DEBUG5: blobURL作成OK');
-  }catch(e){alert('DEBUG5: blobURL失敗 '+e.message);return;}
+  var blobUrl=window.URL.createObjectURL(f);
 
   if(type==='inf'){
     document.getElementById('inf-img').src=blobUrl;
-    document.getElementById('inf-upload').style.display='none';
+    document.getElementById('inf-file').style.display='none';
     document.getElementById('inf-prev').style.display='block';
     document.getElementById('inf-badge').textContent='(固定中)';
-    alert('DEBUG6: inf表示完了');
     fileToBase64(f,function(b64){if(b64)state.infImg=b64;});
   }else{
     document.getElementById('prod-img').src=blobUrl;
-    document.getElementById('prod-upload').style.display='none';
+    document.getElementById('prod-file').style.display='none';
     document.getElementById('prod-prev').style.display='block';
-    alert('DEBUG6: prod表示完了');
     fileToBase64(f,function(b64){
       if(b64){state.prodImg=b64;state.prodB64=b64;}
       if(state.pn.trim()&&b64)runAI(state.pn.trim(),b64);
@@ -337,7 +315,7 @@ function handleFile(evt,type){
 function clearInf(){
   state.infImg=null;
   document.getElementById('inf-prev').style.display='none';
-  document.getElementById('inf-upload').style.display='block';
+  document.getElementById('inf-file').style.display='block';
   document.getElementById('inf-badge').textContent='';
   document.getElementById('inf-file').value='';
 }
@@ -345,7 +323,7 @@ function clearInf(){
 function clearProd(){
   state.prodImg=null;state.prodB64=null;
   document.getElementById('prod-prev').style.display='none';
-  document.getElementById('prod-upload').style.display='block';
+  document.getElementById('prod-file').style.display='block';
   document.getElementById('prod-file').value='';
 }
 
