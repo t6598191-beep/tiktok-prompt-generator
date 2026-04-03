@@ -6,23 +6,17 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Grok Prompt Generator</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{background:#0a0a0f;color:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Hiragino Kaku Gothic ProN',sans-serif;min-height:100vh}
-
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0f;color:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans',sans-serif;min-height:100vh}
 .hdr{background:linear-gradient(135deg,#1a1a2e,#0f3460);padding:24px 16px 20px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.06)}
 .hdr .sub{font-size:9px;font-weight:700;letter-spacing:3px;color:#ff6b6b;text-transform:uppercase;margin-bottom:6px}
 .hdr h1{font-size:20px;font-weight:900;color:#fff;line-height:1.3}
 .hdr p{font-size:11px;color:#888;margin-top:6px}
-
 .api-bar{margin:12px 14px;padding:12px;background:rgba(168,85,247,0.06);border:1px solid rgba(168,85,247,0.2);border-radius:12px}
-.api-bar .al{font-size:10px;font-weight:700;color:#a855f7;margin-bottom:4px;display:block}
+.api-bar .al{font-size:10px;font-weight:700;color:#a855f7;margin-bottom:4px}
 .api-bar input{width:100%;padding:8px 10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#f5f5f7;font-size:12px;outline:none;font-family:monospace}
 .api-bar .hint{font-size:9px;color:#777;margin-top:4px}
 .api-bar .hint a{color:#a855f7;text-decoration:none}
-.api-status{font-size:10px;margin-top:4px;display:none}
-.api-status.ok{color:#2ed573;display:block}
-.api-status.err{color:#ff6b6b;display:block}
-
 .rule{margin:12px 14px;padding:14px;background:rgba(255,107,107,0.05);border:1px solid rgba(255,107,107,0.15);border-radius:12px}
 .rule-title{font-size:10px;font-weight:700;color:#ff6b6b;margin-bottom:6px}
 .rule-row{display:flex;gap:6px}
@@ -30,35 +24,28 @@ body{background:#0a0a0f;color:#f5f5f7;font-family:-apple-system,BlinkMacSystemFo
 .rule-card .t{font-size:9px;color:#ff6b6b;font-weight:700}
 .rule-card .r{font-size:11px;font-weight:700;margin:2px 0}
 .rule-card .d{font-size:8px;color:#777}
-
 .wrap{padding:14px}
 .imgs{display:flex;gap:10px;margin-bottom:14px}
 .img-slot{flex:1}
-.img-slot-label{font-size:10px;font-weight:600;color:#999;display:block;margin-bottom:4px}
+.img-slot-label{font-size:10px;font-weight:600;color:#999;margin-bottom:4px}
 .img-slot-label .badge{color:#ffa502;font-size:9px}
-
-/* Simple file input - no hiding tricks, Safari-safe */
-.file-input{display:block;width:100%;padding:12px 8px;background:rgba(255,255,255,0.04);border:2px dashed rgba(255,255,255,0.15);border-radius:10px;color:#888;font-size:12px;cursor:pointer}
-.file-input::-webkit-file-upload-button{background:rgba(255,255,255,0.1);color:#ccc;border:1px solid rgba(255,255,255,0.2);border-radius:6px;padding:6px 12px;font-size:11px;cursor:pointer;margin-right:8px}
-
+.file-input{display:block;width:100%;padding:12px 8px;background:rgba(255,255,255,0.04);border:2px dashed rgba(255,255,255,0.15);border-radius:10px;color:#888;font-size:12px}
+.file-input::-webkit-file-upload-button{background:rgba(255,255,255,0.1);color:#ccc;border:1px solid rgba(255,255,255,0.2);border-radius:6px;padding:6px 12px;font-size:11px;margin-right:8px}
 .img-prev{position:relative;width:100%;height:100px;border-radius:10px;overflow:hidden;border:1px solid rgba(255,107,107,0.3);display:none}
 .img-prev img{width:100%;height:100%;object-fit:cover}
 .img-del{position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.8);border:none;color:#ff6b6b;border-radius:50%;width:28px;height:28px;font-size:14px;cursor:pointer;z-index:10}
-
 .lbl{font-size:11px;font-weight:600;color:#999;display:block;margin-bottom:4px}
-input[type=text],select{width:100%;padding:10px 12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#f5f5f7;font-size:13px;outline:none;-webkit-appearance:none;appearance:none}
+input[type=text],select{width:100%;padding:10px 12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#f5f5f7;font-size:13px;outline:none;-webkit-appearance:none}
 .mb{margin-bottom:14px}
 .ai-status{margin-top:6px;font-size:11px;color:#ffa502}
-.sn-row{margin-top:6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.sn-row{margin-top:6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;display:none}
 .sn-row .tag{font-size:12px;font-weight:700;color:#a855f7;background:rgba(168,85,247,0.1);padding:2px 8px;border-radius:6px}
 .sn-row input{flex:1;min-width:60px;padding:3px 6px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#f5f5f7;font-size:11px;outline:none}
-.scene-info{margin-top:4px;font-size:10px;color:#ffa502}
+.scene-info{margin-top:4px;font-size:10px;color:#ffa502;display:none}
 .merit-info{margin-top:4px;font-size:10px;color:#2ed573;background:rgba(46,213,115,0.07);border-radius:6px;padding:4px 8px;display:none}
-.gen-btn{width:100%;padding:13px;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.3s}
-.gen-btn.on{background:linear-gradient(135deg,#ff6b6b,#ee5a24);color:#fff}
-.gen-btn.off{background:rgba(255,255,255,0.05);color:#555;cursor:default}
-
-.results{padding:16px 14px 40px}
+.gen-btn{width:100%;padding:13px;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,#ff6b6b,#ee5a24);color:#fff;transition:all 0.3s}
+.gen-btn:disabled{background:rgba(255,255,255,0.05);color:#555;cursor:default}
+.results{padding:16px 14px 40px;display:none}
 .img-prompt-sec{background:rgba(168,85,247,0.07);border:2px solid rgba(168,85,247,0.35);border-radius:14px;padding:16px;margin-bottom:16px}
 .img-prompt-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
 .img-prompt-hdr .tt{font-size:12px;font-weight:700;color:#a855f7}
@@ -67,7 +54,7 @@ input[type=text],select{width:100%;padding:10px 12px;background:rgba(255,255,255
 .gemini-hint b{color:#c084fc}
 .gen-img-area{margin:10px 0;text-align:center}
 .gen-img-area img{max-width:100%;max-height:300px;border-radius:12px;border:2px solid rgba(168,85,247,0.3)}
-.gen-img-btn{width:100%;padding:10px;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;margin-top:8px;background:linear-gradient(135deg,#a855f7,#7c3aed);color:#fff;transition:all 0.3s}
+.gen-img-btn{width:100%;padding:10px;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;margin-top:8px;background:linear-gradient(135deg,#a855f7,#7c3aed);color:#fff}
 .gen-img-btn:disabled{opacity:0.4;cursor:default}
 .gen-img-btn.loading{background:rgba(168,85,247,0.3);color:#a855f7}
 .gen-img-dl{display:inline-block;margin-top:6px;padding:6px 16px;background:rgba(46,213,115,0.15);color:#2ed573;border:1px solid rgba(46,213,115,0.3);border-radius:8px;font-size:11px;font-weight:600;text-decoration:none}
@@ -90,7 +77,6 @@ input[type=text],select{width:100%;padding:10px 12px;background:rgba(255,255,255
 .regen{width:100%;padding:10px;background:rgba(255,255,255,0.04);color:#888;border:1px solid rgba(255,255,255,0.1);border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;margin-top:4px}
 .sec-title{font-size:10px;font-weight:700;color:#777;margin-bottom:8px}
 </style>
-
 </head>
 <body>
 
@@ -102,9 +88,8 @@ input[type=text],select{width:100%;padding:10px 12px;background:rgba(255,255,255
 
 <div class="api-bar">
   <div class="al">🔑 Gemini API Key</div>
-  <input type="text" id="api-key" placeholder="AIzaSy..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" oninput="onApiKey(this.value)">
+  <input type="text" id="api-key" placeholder="AIzaSy..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
   <div class="hint">👉 <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com/apikey</a> で無料取得</div>
-  <div id="api-status" class="api-status"></div>
 </div>
 
 <div class="rule">
@@ -118,7 +103,6 @@ input[type=text],select{width:100%;padding:10px 12px;background:rgba(255,255,255
 
 <div class="wrap">
   <div class="imgs">
-    <!-- Influencer image -->
     <div class="img-slot">
       <div class="img-slot-label">👩 インフルエンサー <span class="badge" id="inf-badge"></span></div>
       <input type="file" accept="image/*" class="file-input" id="inf-file" onchange="handleFile(this.files,'inf')">
@@ -127,7 +111,6 @@ input[type=text],select{width:100%;padding:10px 12px;background:rgba(255,255,255
         <button type="button" class="img-del" onclick="clearInf()">✕</button>
       </div>
     </div>
-    <!-- Product image -->
     <div class="img-slot">
       <div class="img-slot-label">📦 商品画像</div>
       <input type="file" accept="image/*" class="file-input" id="prod-file" onchange="handleFile(this.files,'prod')">
@@ -140,20 +123,20 @@ input[type=text],select{width:100%;padding:10px 12px;background:rgba(255,255,255
 
   <div class="mb">
     <div class="lbl">商品名（タイトル貼付）*</div>
-    <input type="text" id="pn-input" placeholder="例: パンケーキミックス ふわふわ 200g..." oninput="onPnInput(this.value)">
+    <input type="text" id="pn-input" placeholder="例: パンケーキミックス ふわふわ 200g...">
     <div id="ai-status" class="ai-status" style="display:none"></div>
-    <div id="sn-row" class="sn-row" style="display:none">
+    <div id="sn-row" class="sn-row">
       <span style="font-size:10px;color:#888">セリフ用:</span>
       <span class="tag" id="sn-tag"></span>
-      <input type="text" id="sn-input" placeholder="変更可" oninput="state.sn=this.value">
+      <input type="text" id="sn-input" placeholder="変更可">
     </div>
-    <div id="scene-info" class="scene-info" style="display:none"></div>
+    <div id="scene-info" class="scene-info"></div>
     <div id="merit-info" class="merit-info"></div>
   </div>
 
   <div class="mb">
     <div class="lbl">女性スタイル</div>
-    <select id="style-sel" onchange="state.st=this.value">
+    <select id="style-sel">
       <option value="清楚系">清楚系</option>
       <option value="大人キレイ系" selected>大人キレイ系</option>
       <option value="韓国系">韓国系</option>
@@ -161,13 +144,19 @@ input[type=text],select{width:100%;padding:10px 12px;background:rgba(255,255,255
     </select>
   </div>
 
-<button class="gen-btn off" id="gen-btn" disabled onclick="generate()">🎬 プロンプト生成</button>
+<button class="gen-btn" id="gen-btn" onclick="generate()">🎬 プロンプト生成</button>
 
 </div>
 
-<div id="results" class="results" style="display:none"></div>
+<div id="results" class="results"></div>
 
 <script>
+// ===== NO addEventListener, NO state dependency for button =====
+// Read everything from DOM directly when needed
+
+var infB64=null, prodB64=null;
+var aiResult=null; // cached AI result
+
 var TELOPS=["まだ知らないの？","え、これ知ってる？","正直これなしじゃ無理","もっと早く知りたかった","これ1つで全部解決","3日で変わった…","ガチで毎日使ってる","教えたくなかったけど…","概念変わるよこれ","知らないと損してる","やばいの見つけた","マジで人生変わる","これ以外考えられない","1回使ったら戻れない"];
 var CTAS=["気になる人は説明欄から","詳細は説明欄をチェック","説明欄にリンク貼ってます","これマジでおすすめ→説明欄","在庫なくなる前に→説明欄"];
 function pick(a){return a[Math.floor(Math.random()*a.length)];}
@@ -179,105 +168,55 @@ var STYLES={
   "小悪魔系":"小悪魔系の可愛い日本人女性（ミディアムヘア、上目遣い、甘えた表情、キャミソールやオフショルダー）"
 };
 var STYLES_EN={
-  "清楚系":"beautiful Japanese woman, long straight black hair, natural makeup, fair skin, stylish casual outfit, clean and elegant look",
-  "大人キレイ系":"beautiful mature Japanese woman, wavy brown hair, glamorous makeup, fashionable outfit, sophisticated and elegant",
-  "韓国系":"beautiful Korean-style Japanese woman, sleek straight hair, luminous glass skin, trendy Korean fashion, elegant and stylish",
-  "小悪魔系":"cute playful Japanese woman, medium length hair, charming coy smile, trendy off-shoulder or camisole top, youthful and energetic"
+  "清楚系":"beautiful Japanese woman, long straight black hair, natural makeup, fair skin, stylish casual outfit",
+  "大人キレイ系":"beautiful mature Japanese woman, wavy brown hair, glamorous makeup, fashionable outfit, sophisticated",
+  "韓国系":"beautiful Korean-style Japanese woman, sleek straight hair, luminous glass skin, trendy Korean fashion",
+  "小悪魔系":"cute playful Japanese woman, medium length hair, charming coy smile, trendy off-shoulder top"
 };
 
-var state={pn:"",sn:"",st:"大人キレイ系",infImg:null,prodImg:null,prodB64:null,sp:null,aiLoading:false,busy:false};
-var timer=null;
+// ===== Helper: read values from DOM =====
+function getPn(){return(document.getElementById('pn-input').value||'').trim();}
+function getKey(){return(document.getElementById('api-key').value||'').trim();}
+function getSt(){return document.getElementById('style-sel').value||'大人キレイ系';}
+function getSn(){var v=document.getElementById('sn-input').value;return v||(aiResult&&aiResult.shortName)||'';}
 
-function getApiKey(){return(document.getElementById('api-key').value||'').trim();}
-
-async function callGemini(prompt,imgB64){
-  var key=getApiKey();
-  if(!key)throw new Error('Gemini API Keyを入力してください');
+// ===== Gemini API =====
+function callGemini(key,prompt,imgB64){
   var parts=[];
   if(imgB64){
     var mt='image/jpeg';
     if(imgB64.indexOf('data:image/png')>=0)mt='image/png';
-    else if(imgB64.indexOf('data:image/webp')>=0)mt='image/webp';
     parts.push({inlineData:{mimeType:mt,data:imgB64.split(',')[1]}});
   }
   parts.push({text:prompt});
-  var url='https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key='+key;
-  var r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:parts}],generationConfig:{temperature:0.9,maxOutputTokens:1024}})});
-  var d=await r.json();
-  if(d.error)throw new Error(d.error.message||JSON.stringify(d.error));
-  if(!d.candidates||!d.candidates[0])throw new Error('レスポンスが空です');
-  return d.candidates[0].content.parts[0].text;
-}
-
-async function callGeminiImage(prompt,refImgB64){
-  var key=getApiKey();
-  if(!key)throw new Error('Gemini API Keyを入力してください');
-  var parts=[];
-  if(refImgB64){
-    var mt='image/jpeg';
-    if(refImgB64.indexOf('data:image/png')>=0)mt='image/png';
-    parts.push({inlineData:{mimeType:mt,data:refImgB64.split(',')[1]}});
-  }
-  parts.push({text:prompt});
-  var url='https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key='+key;
-  var r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:parts}],generationConfig:{responseModalities:["TEXT","IMAGE"],temperature:1.0,maxOutputTokens:1024}})});
-  var d=await r.json();
-  if(d.error)throw new Error(d.error.message||JSON.stringify(d.error));
-  if(!d.candidates||!d.candidates[0])throw new Error('画像生成に失敗しました');
-  var rp=d.candidates[0].content.parts;
-  for(var i=0;i<rp.length;i++){if(rp[i].inlineData)return'data:'+rp[i].inlineData.mimeType+';base64,'+rp[i].inlineData.data;}
-  throw new Error('画像データが返されませんでした');
-}
-
-function runAI(name,imgB64){
-  if(!name||name.length<2)return;
-  if(!getApiKey()){document.getElementById('ai-status').style.display='block';document.getElementById('ai-status').textContent='⚠️ Gemini API Keyを入力してください';return;}
-  state.aiLoading=true;updateBtn();
-  document.getElementById('ai-status').style.display='block';
-  document.getElementById('ai-status').textContent='🔍 Gemini分析中...';
-  document.getElementById('merit-info').style.display='none';
-  var prompt="JSONのみ回答。Markdownコードブロック不要。余計な説明不要。\n商品名:「"+name+"」\n\nTask1 shortName: 2〜8文字に簡略化。修飾語・スペック・記号を全削除。\nTask2 category: food/beauty/health/gadget/home/fashion/other から1つ\nTask3 keyMerit: 商品名から読み取れる最大の特徴を具体的に\nTask4 usageScene: 商品を使う自然なシーン1文\nTask5 セリフ3本（shortNameのみ使用/タメ口女の子語尾/keyMeritの具体ワードを必ず入れる）\n禁止ワード: やばい・すごい・まじで・色々試した・効果が本当に・もう手放せない・実際使ってみたら・概念が変わった\nhook(25〜45字): 商品の特徴→「〜見て？」「〜知ってた？」「〜分かる？」で終わる\nmerit(30〜50字): keyMeritの体験を具体的に\nclose(20〜35字): 共感+説明欄誘導\n\nJSON: {\"shortName\":\"名\",\"category\":\"カテゴリ\",\"keyMerit\":\"魅力\",\"usageScene\":\"シーン\",\"hook\":\"セリフ\",\"merit\":\"セリフ\",\"close\":\"セリフ\"}";
-  callGemini(prompt,imgB64).then(function(raw){
-    var clean=raw.replace(/```json\n?|```/g,'').trim();
-    var m=clean.match(/\{[\s\S]*\}/);if(m)clean=m[0];
-    try{
-      var p=JSON.parse(clean);
-      if(p.shortName){state.sn=p.shortName;showSN();}
-      if(p.hook||p.merit||p.close){state.sp={hook:p.hook||'',merit:p.merit||'',close:p.close||'',usageScene:p.usageScene||''};}
-      if(p.usageScene){document.getElementById('scene-info').style.display='block';document.getElementById('scene-info').textContent='🎬 '+p.usageScene;}
-      if(p.keyMerit){var mEl=document.getElementById('merit-info');mEl.style.display='block';mEl.textContent='✨ 訴求ポイント: '+p.keyMerit;}
-      var as=document.getElementById('api-status');as.className='api-status ok';as.textContent='✅ API接続OK';as.style.display='block';
-    }catch(e){console.error('parse',e,clean);}
-    state.aiLoading=false;document.getElementById('ai-status').style.display='none';updateBtn();
-  }).catch(function(e){
-    document.getElementById('ai-status').textContent='⚠️ '+e.message;
-    var as=document.getElementById('api-status');as.className='api-status err';as.textContent='❌ '+e.message;as.style.display='block';
-    state.aiLoading=false;updateBtn();
+  return fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key='+key,{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({contents:[{parts:parts}],generationConfig:{temperature:0.9,maxOutputTokens:1024}})
+  }).then(function(r){return r.json();}).then(function(d){
+    if(d.error)throw new Error(d.error.message);
+    if(!d.candidates||!d.candidates[0])throw new Error('Empty response');
+    return d.candidates[0].content.parts[0].text;
   });
 }
 
-function makeImagePrompt(){
-  var d=state.sn||'product';var se=STYLES_EN[state.st]||STYLES_EN['大人キレイ系'];
-  var ir=state.infImg?'IMPORTANT: Use the person in the reference photo as the model. ':'';
-  var pr=state.prodImg?'The product in the reference photo should appear in her hand. ':'';
-  return'Photorealistic vertical portrait photo, 9:16 aspect ratio, 1080x1920px.\n'+ir+pr+'Subject: '+se+'. She holds '+d+' near her chest, looking at camera with a charming confident smile.\nComposition: upper body to thighs, subject slightly left of center, product on right side, 20% empty space at top.\nBackground: bright indoor, white or beige wall, natural window light, beautiful soft bokeh.\nLighting: soft warm cinematic light, shallow depth of field.\nQuality: ultra-high resolution, photorealistic, 4K, magazine quality. First frame of TikTok video.';
-}
-
-function makePrompts(){
-  var d=state.sn||'これ',pn=state.pn,st=state.st,sp=state.sp;
-  var telop=pick(TELOPS),cta=pick(CTAS);
-  var s1=(sp&&sp.hook)||'これが気になりすぎて試してみたから見て？';
-  var s2=(sp&&sp.merit)||'使い始めて分かったんだけど、全然違ったの。';
-  var s3=(sp&&sp.close)||'気になった人は説明欄からチェックしてみて。';
-  var us=(sp&&sp.usageScene)||'女性が商品を実際に使用しているシーン';
-  var sd=STYLES[st]||STYLES['大人キレイ系'];
-  var inf=state.infImg?'\n\nINFLUENCER: 添付のインフルエンサー写真の人物の顔・髪型・体型を忠実に再現すること。':'';
-  var pr=state.prodImg?'\n\nPRODUCT IMAGE: 添付の商品画像のデザイン・色・形・ロゴを忠実に再現すること。':'';
-  var ref='\n\n[PRODUCT]\nFull: '+pn+'\nSpeak as: '+d+' ONLY.';
-  var p1='Generate a 10-second vertical video (9:16).\n\nScene: '+sd+' が画面に向かって語りかけている。おしゃれな服装。明るい室内。\n\nSpeech: 「'+s1+'」\n驚きから笑顔へ。髪をかき上げる仕草。\n\nTelop: 「'+telop+'」を画面中央上部に大きく表示。太ゴシック白文字黒縁取り。\n\nStyle: Cinematic, soft lighting, shallow DOF, warm. 9:16, photorealistic.'+inf+pr+ref;
-  var p2='Generate a 10-second vertical video (9:16).\n\nScene: '+sd+' が「'+d+'」を使用中。\n使用シーン: '+us+'\n\nAction:\n1. (0-3s) 商品を手に取る\n2. (3-7s) 実際に使用中クローズアップ\n3. (7-10s) 満足リアクション\n\nSpeech: 「'+s2+'」\nTelop: なし。9:16, photorealistic.'+inf+pr+ref;
-  var p3='Generate a 10-second vertical video (9:16).\n\nScene: '+sd+' が「'+d+'」を手に持ち甘い笑顔。背景ボケ。\n\nSpeech: 「'+s3+'」\n最後にウィンク。商品を胸元の高さに。\n\nTelop: 画面左下に「'+cta+'」を最後3秒のみ。小さめ白文字。\nStyle: Golden hour, bokeh. 9:16, photorealistic.'+inf+pr+ref;
-  return{promptThumb:makeImagePrompt(),prompt1:p1,prompt2:p2,prompt3:p3,telop:telop,speech1:s1,speech2:s2,speech3:s3,cta:cta};
+function callGeminiImage(key,prompt,refB64){
+  var parts=[];
+  if(refB64){
+    var mt='image/jpeg';
+    if(refB64.indexOf('data:image/png')>=0)mt='image/png';
+    parts.push({inlineData:{mimeType:mt,data:refB64.split(',')[1]}});
+  }
+  parts.push({text:prompt});
+  return fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key='+key,{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({contents:[{parts:parts}],generationConfig:{responseModalities:["TEXT","IMAGE"],temperature:1.0,maxOutputTokens:1024}})
+  }).then(function(r){return r.json();}).then(function(d){
+    if(d.error)throw new Error(d.error.message);
+    if(!d.candidates||!d.candidates[0])throw new Error('Failed');
+    var rp=d.candidates[0].content.parts;
+    for(var i=0;i<rp.length;i++){if(rp[i].inlineData)return'data:'+rp[i].inlineData.mimeType+';base64,'+rp[i].inlineData.data;}
+    throw new Error('No image data');
+  });
 }
 
 // ===== IMAGE HANDLING =====
@@ -290,58 +229,117 @@ function fileToBase64(file,cb){
 
 function handleFile(files,type){
   if(!files||files.length===0)return;
-  var f=files[0];
-  if(!f)return;
-
+  var f=files[0];if(!f)return;
   var blobUrl=window.URL.createObjectURL(f);
-
   if(type==='inf'){
     document.getElementById('inf-img').src=blobUrl;
     document.getElementById('inf-file').style.display='none';
     document.getElementById('inf-prev').style.display='block';
     document.getElementById('inf-badge').textContent='(固定中)';
-    fileToBase64(f,function(b64){if(b64)state.infImg=b64;});
+    fileToBase64(f,function(b64){infB64=b64;});
   }else{
     document.getElementById('prod-img').src=blobUrl;
     document.getElementById('prod-file').style.display='none';
     document.getElementById('prod-prev').style.display='block';
-    fileToBase64(f,function(b64){
-      if(b64){state.prodImg=b64;state.prodB64=b64;}
-      if(state.pn.trim()&&b64)runAI(state.pn.trim(),b64);
-    });
+    fileToBase64(f,function(b64){prodB64=b64;});
   }
 }
 
 function clearInf(){
-  state.infImg=null;
+  infB64=null;
   document.getElementById('inf-prev').style.display='none';
   document.getElementById('inf-file').style.display='block';
   document.getElementById('inf-badge').textContent='';
   document.getElementById('inf-file').value='';
 }
-
 function clearProd(){
-  state.prodImg=null;state.prodB64=null;
+  prodB64=null;
   document.getElementById('prod-prev').style.display='none';
   document.getElementById('prod-file').style.display='block';
   document.getElementById('prod-file').value='';
 }
 
-function updateBtn(){
+// ===== MAIN GENERATE (AI + prompts in one flow) =====
+function generate(){
+  var pn=getPn();
+  var key=getKey();
+  if(!pn){alert('商品名を入力してください');return;}
+  if(!key){alert('Gemini API Keyを入力してください');return;}
+
   var btn=document.getElementById('gen-btn');
-  var ok=state.pn.trim()&&!state.busy&&!state.aiLoading&&getApiKey();
-  btn.disabled=!ok;btn.className='gen-btn '+(ok?'on':'off');
-  if(state.aiLoading)btn.textContent='🔍 Gemini分析中...';
-  else if(state.busy)btn.textContent='⏳ 生成中...';
-  else btn.textContent='🎬 プロンプト生成';
+  btn.disabled=true;btn.textContent='🔍 Gemini分析中...';
+
+  // Step 1: Call Gemini for AI analysis (serifs, shortName, etc.)
+  var prompt="JSONのみ回答。Markdownコードブロック不要。余計な説明不要。\n商品名:「"+pn+"」\n\nTask1 shortName: 2〜8文字に簡略化。修飾語・スペック・記号を全削除。\n例:「9インチCarPlay車載ディスプレイ」→「車載ディスプレイ」「パンケーキミックス200g」→「パンケーキ」\n\nTask2 category: food/beauty/health/gadget/home/fashion/other から1つ\n\nTask3 keyMerit: 商品名から読み取れる最大の特徴を具体的に（数字・成分・食感ワードを使う）\n\nTask4 usageScene: 商品を使う自然なシーン1文\n\nTask5 セリフ3本 ★重要★\nルール: shortNameのみ使用 / タメ口女の子語尾 / keyMeritの具体ワードを必ず入れる\n禁止ワード: やばい・すごい・まじで・色々試した・効果が本当に・もう手放せない・実際使ってみたら・概念が変わった\n\ncategoryごとの参考例:\nfood→「混ぜて焼くだけでこんなにふわふわになるの見て？」\nbeauty→「ヒアルロン酸がぷるっぷるで塗った瞬間分かるよ」\ngadget→「10000mAhなのにこんなにコンパクトなの知ってた？」\nhealth→「低反発で座ってみたら腰の重さが全然違うの分かる？」\nfashion→「この素材で着るだけでスタイルよく見えるの知ってた？」\n\nhook(25〜45字): 商品の特徴を最初に言って「〜見て？」「〜知ってた？」「〜分かる？」で終わる\nmerit(30〜50字): keyMeritの体験を具体的に。禁止ワード不使用\nclose(20〜35字): 共感+説明欄誘導\n\nJSON: {\"shortName\":\"名\",\"category\":\"カテゴリ\",\"keyMerit\":\"魅力\",\"usageScene\":\"シーン\",\"hook\":\"セリフ\",\"merit\":\"セリフ\",\"close\":\"セリフ\"}";
+
+  callGemini(key,prompt,prodB64).then(function(raw){
+    var clean=raw.replace(/```json\n?|```/g,'').trim();
+    var m=clean.match(/\{[\s\S]*\}/);if(m)clean=m[0];
+    try{
+      aiResult=JSON.parse(clean);
+    }catch(e){
+      aiResult=null;
+    }
+
+    // Show AI results
+    if(aiResult){
+      if(aiResult.shortName){
+        document.getElementById('sn-row').style.display='flex';
+        document.getElementById('sn-tag').textContent='「'+aiResult.shortName+'」';
+        document.getElementById('sn-input').value=aiResult.shortName;
+      }
+      if(aiResult.usageScene){
+        document.getElementById('scene-info').style.display='block';
+        document.getElementById('scene-info').textContent='🎬 '+aiResult.usageScene;
+      }
+      if(aiResult.keyMerit){
+        document.getElementById('merit-info').style.display='block';
+        document.getElementById('merit-info').textContent='✨ 訴求ポイント: '+aiResult.keyMerit;
+      }
+    }
+
+    // Step 2: Build prompts with AI-generated serifs
+    btn.textContent='🎬 プロンプト生成中...';
+    setTimeout(function(){
+      var r=buildPrompts(pn);
+      renderResults(r);
+      btn.disabled=false;btn.textContent='🎬 プロンプト生成';
+    },100);
+
+  }).catch(function(e){
+    alert('Gemini API エラー: '+e.message);
+    btn.disabled=false;btn.textContent='🎬 プロンプト生成';
+  });
 }
 
-function showSN(){
-  document.getElementById('sn-row').style.display='flex';
-  document.getElementById('sn-tag').textContent='「'+state.sn+'」';
-  document.getElementById('sn-input').value=state.sn;
+function buildPrompts(pn){
+  var sn=getSn()||(aiResult&&aiResult.shortName)||'これ';
+  var st=getSt();
+  var telop=pick(TELOPS);
+  var cta=pick(CTAS);
+  var s1=(aiResult&&aiResult.hook)||'これが気になりすぎて試してみたから見て？';
+  var s2=(aiResult&&aiResult.merit)||'使い始めて分かったんだけど、全然違ったの。';
+  var s3=(aiResult&&aiResult.close)||'気になった人は説明欄からチェックしてみて。';
+  var us=(aiResult&&aiResult.usageScene)||'女性が商品を実際に使用しているシーン';
+  var sd=STYLES[st]||STYLES['大人キレイ系'];
+  var se=STYLES_EN[st]||STYLES_EN['大人キレイ系'];
+
+  var inf=infB64?'\n\nINFLUENCER: 添付のインフルエンサー写真の人物の顔・髪型・体型を忠実に再現すること。':'';
+  var pr=prodB64?'\n\nPRODUCT IMAGE: 添付の商品画像のデザイン・色・形・ロゴを忠実に再現すること。':'';
+  var ref='\n\n[PRODUCT]\nFull: '+pn+'\nSpeak as: '+sn+' ONLY.';
+
+  var p1='Generate a 10-second vertical video (9:16).\n\nScene: '+sd+' が画面に向かって語りかけている。おしゃれな服装。明るい室内。\n\nSpeech: 「'+s1+'」\n驚きから笑顔へ。髪をかき上げる仕草。\n\nTelop: 「'+telop+'」を画面中央上部に大きく表示。太ゴシック白文字黒縁取り。\n\nStyle: Cinematic, soft lighting, shallow DOF, warm. 9:16, photorealistic.'+inf+pr+ref;
+  var p2='Generate a 10-second vertical video (9:16).\n\nScene: '+sd+' が「'+sn+'」を使用中。\n使用シーン: '+us+'\n\nAction:\n1. (0-3s) 商品を手に取る\n2. (3-7s) 実際に使用中クローズアップ\n3. (7-10s) 満足リアクション\n\nSpeech: 「'+s2+'」\nTelop: なし。9:16, photorealistic.'+inf+pr+ref;
+  var p3='Generate a 10-second vertical video (9:16).\n\nScene: '+sd+' が「'+sn+'」を手に持ち甘い笑顔。背景ボケ。\n\nSpeech: 「'+s3+'」\n最後にウィンク。商品を胸元の高さに。\n\nTelop: 画面左下に「'+cta+'」を最後3秒のみ。小さめ白文字。\nStyle: Golden hour, bokeh. 9:16, photorealistic.'+inf+pr+ref;
+
+  var ir=infB64?'IMPORTANT: Use the person in the reference photo as the model. ':'';
+  var prr=prodB64?'The product in the reference photo should appear in her hand. ':'';
+  var pt='Photorealistic vertical portrait photo, 9:16 aspect ratio, 1080x1920px.\n'+ir+prr+'Subject: '+se+'. She holds '+sn+' near her chest, looking at camera with a charming confident smile.\nComposition: upper body to thighs, subject slightly left of center, product on right side, 20% empty space at top.\nBackground: bright indoor, white or beige wall, natural window light, beautiful soft bokeh.\nLighting: soft warm cinematic light, shallow depth of field.\nQuality: ultra-high resolution, photorealistic, 4K, magazine quality. First frame of TikTok video.';
+
+  return{promptThumb:pt,prompt1:p1,prompt2:p2,prompt3:p3,telop:telop,speech1:s1,speech2:s2,speech3:s3,cta:cta};
 }
 
+// ===== COPY =====
 function copyText(text,btnEl){
   if(navigator.clipboard&&navigator.clipboard.writeText){
     navigator.clipboard.writeText(text).then(function(){showCopied(btnEl);}).catch(function(){fallbackCopy(text,btnEl);});
@@ -350,19 +348,19 @@ function copyText(text,btnEl){
 function fallbackCopy(text,btnEl){
   var ta=document.createElement('textarea');ta.value=text;ta.style.cssText='position:fixed;left:-9999px;top:-9999px;opacity:0';
   document.body.appendChild(ta);ta.focus();ta.setSelectionRange(0,ta.value.length);
-  var ok=false;try{ok=document.execCommand('copy');}catch(e){}
-  document.body.removeChild(ta);
+  var ok=false;try{ok=document.execCommand('copy');}catch(e){}document.body.removeChild(ta);
   if(ok)showCopied(btnEl);else{btnEl.textContent='長押しコピー';setTimeout(function(){btnEl.textContent='コピー';},2000);}
 }
 function showCopied(b){b.textContent='OK!';b.style.background='#27ae60';b.style.color='#fff';setTimeout(function(){b.textContent='コピー';b.style.background='rgba(255,255,255,0.08)';b.style.color='#aaa';},1500);}
 
+// ===== IMAGE GEN =====
 function generateImage(promptId){
   var prompt=document.getElementById(promptId).textContent;
   var btn=document.getElementById('imgbtn-'+promptId);
   var area=document.getElementById('imgarea-'+promptId);
+  var key=getKey();if(!key){alert('API Key必要');return;}
   btn.disabled=true;btn.textContent='🎨 画像生成中...';btn.className='gen-img-btn loading';
-  var refImg=state.infImg||state.prodImg||null;
-  callGeminiImage(prompt,refImg).then(function(dataUrl){
+  callGeminiImage(key,prompt,infB64||prodB64||null).then(function(dataUrl){
     area.innerHTML='<img src="'+dataUrl+'" alt="Generated">';
     var dl=document.createElement('a');dl.className='gen-img-dl';dl.textContent='📥 画像をダウンロード';dl.href=dataUrl;dl.download='tiktok-'+Date.now()+'.png';
     area.appendChild(document.createElement('br'));area.appendChild(dl);
@@ -373,12 +371,13 @@ function generateImage(promptId){
   });
 }
 
+// ===== RENDER =====
 function escH(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 
 function renderResults(r){
   var h='<div class="img-prompt-sec"><div class="img-prompt-hdr"><span class="tt">🖼 冒頭画像プロンプト</span><span class="step">① Geminiで画像生成</span></div><div class="gemini-hint">👉 下の「画像を生成」ボタンで<b>Gemini API</b>から直接画像生成できます</div>'+boxImg('IMAGE','Gemini用・冒頭フレーム',r.promptThumb,'#a855f7',0)+'</div>';
   h+='<div class="preview"><div class="prev-row"><div><div class="ll" style="color:#ff6b6b">TELOP</div><div style="font-size:14px;font-weight:700;color:#ff6b6b;margin-top:2px">「'+escH(r.telop)+'」</div></div><div><div class="ll" style="color:#2ed573">CTA（左下）</div><div style="font-size:12px;font-weight:600;color:#2ed573;margin-top:2px">'+escH(r.cta)+'</div></div></div>';
-  h+='<div class="speech-sec"><div class="ll">セリフ</div>';
+  h+='<div class="speech-sec"><div class="ll">セリフ（Gemini生成）</div>';
   [{l:"冒頭",t:r.speech1,c:"#ff6b6b"},{l:"中盤",t:r.speech2,c:"#ffa502"},{l:"締め",t:r.speech3,c:"#2ed573"}].forEach(function(x){h+='<div class="speech-line"><span class="la" style="color:'+x.c+'">'+x.l+'</span><span class="tx">'+escH(x.t)+'</span></div>';});
   h+='</div></div>';
   h+='<div class="sec-title">動画プロンプト（Grokに貼り付け）</div>';
@@ -398,17 +397,10 @@ var esc=escH(content);
 return’<div class="copy-box" style="background:'+color+'11;border:1px solid '+color+'33"><div class="copy-hdr"><div class="left"><span class="tag" style="background:'+color+'">’+label+’</span><span class="sub">’+sub+’</span></div><button class="copy-btn" style="background:rgba(255,255,255,0.08);color:#aaa" onclick="copyText(document.getElementById(\'pre'+idx+'\').textContent,this)">コピー</button></div><pre class="copy-pre" id="pre'+idx+'">’+esc+’</pre><div id="imgarea-pre'+idx+'" class="gen-img-area"></div><button id="imgbtn-pre'+idx+'" class="gen-img-btn" onclick="generateImage(\'pre'+idx+'\')">🎨 Geminiで画像を生成</button></div>’;
 }
 
-function generate(){
-if(!state.pn.trim()||state.aiLoading||!getApiKey())return;
-state.busy=true;updateBtn();
-setTimeout(function(){renderResults(makePrompts());state.busy=false;updateBtn();},100);
-}
-
-// INIT - global handler functions
-function onApiKey(v){try{localStorage.setItem(‘gemini_api_key’,v);}catch(ex){}updateBtn();}
-function onPnInput(v){state.pn=v;updateBtn();clearTimeout(timer);if(v.trim().length>=2){timer=setTimeout(function(){runAI(v.trim(),state.prodB64);},1200);}}
-
+// ===== INIT: restore API key =====
 try{var sk=localStorage.getItem(‘gemini_api_key’);if(sk)document.getElementById(‘api-key’).value=sk;}catch(e){}
+// Save API key on blur (works on all browsers)
+document.getElementById(‘api-key’).onblur=function(){try{localStorage.setItem(‘gemini_api_key’,this.value);}catch(e){}};
 </script>
 
 </body>
