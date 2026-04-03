@@ -127,7 +127,7 @@ input[type=text],select{width:100%;padding:10px 12px;background:rgba(255,255,255
         <label class="upload-label">
           👩
           <span>タップして選択</span>
-          <input type="file" accept="image/*" id="inf-file" onchange="onInfFile(this)">
+          <input type="file" accept="image/*" id="inf-file" onchange="handleFile(event,'inf')">
         </label>
       </div>
       <div class="img-prev" id="inf-prev">
@@ -142,7 +142,7 @@ input[type=text],select{width:100%;padding:10px 12px;background:rgba(255,255,255
         <label class="upload-label">
           📦
           <span>タップして選択</span>
-          <input type="file" accept="image/*" id="prod-file" onchange="onProdFile(this)">
+          <input type="file" accept="image/*" id="prod-file" onchange="handleFile(event,'prod')">
         </label>
       </div>
       <div class="img-prev" id="prod-prev">
@@ -295,31 +295,37 @@ function makePrompts(){
 }
 
 // ===== IMAGE HANDLING =====
-function onInfFile(input){
-  var f=input.files[0];if(!f)return;
+function fileToBase64(file,cb){
   var r=new FileReader();
-  r.onload=function(e){
-    state.infImg=e.target.result;
-    document.getElementById('inf-img').src=e.target.result;
+  r.onloadend=function(){cb(r.result);};
+  r.onerror=function(){cb(null);};
+  r.readAsDataURL(file);
+}
+
+function handleFile(evt,type){
+  var input=evt.target;
+  if(!input||!input.files||input.files.length===0)return;
+  var f=input.files[0];
+  if(!f)return;
+
+  // Use createObjectURL for immediate display (Safari-safe)
+  var blobUrl=window.URL.createObjectURL(f);
+
+  if(type==='inf'){
+    document.getElementById('inf-img').src=blobUrl;
     document.getElementById('inf-upload').style.display='none';
     document.getElementById('inf-prev').style.display='block';
     document.getElementById('inf-badge').textContent='(固定中)';
-  };
-  r.readAsDataURL(f);
-}
-
-function onProdFile(input){
-  var f=input.files[0];if(!f)return;
-  var r=new FileReader();
-  r.onload=function(e){
-    state.prodImg=e.target.result;
-    state.prodB64=e.target.result;
-    document.getElementById('prod-img').src=e.target.result;
+    fileToBase64(f,function(b64){if(b64)state.infImg=b64;});
+  }else{
+    document.getElementById('prod-img').src=blobUrl;
     document.getElementById('prod-upload').style.display='none';
     document.getElementById('prod-prev').style.display='block';
-    if(state.pn.trim())runAI(state.pn.trim(),e.target.result);
-  };
-  r.readAsDataURL(f);
+    fileToBase64(f,function(b64){
+      if(b64){state.prodImg=b64;state.prodB64=b64;}
+      if(state.pn.trim()&&b64)runAI(state.pn.trim(),b64);
+    });
+  }
 }
 
 function clearInf(){
