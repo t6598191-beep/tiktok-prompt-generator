@@ -303,24 +303,30 @@ function fileToBase64(file,cb){
 }
 
 function handleFile(evt,type){
+  alert('DEBUG1: handleFile呼ばれた type='+type);
   var input=evt.target;
-  if(!input||!input.files||input.files.length===0)return;
+  if(!input||!input.files||input.files.length===0){alert('DEBUG2: ファイルなし');return;}
   var f=input.files[0];
-  if(!f)return;
+  if(!f){alert('DEBUG3: files[0]なし');return;}
+  alert('DEBUG4: ファイル取得OK name='+f.name+' size='+f.size);
 
-  // Use createObjectURL for immediate display (Safari-safe)
-  var blobUrl=window.URL.createObjectURL(f);
+  try{
+    var blobUrl=window.URL.createObjectURL(f);
+    alert('DEBUG5: blobURL作成OK');
+  }catch(e){alert('DEBUG5: blobURL失敗 '+e.message);return;}
 
   if(type==='inf'){
     document.getElementById('inf-img').src=blobUrl;
     document.getElementById('inf-upload').style.display='none';
     document.getElementById('inf-prev').style.display='block';
     document.getElementById('inf-badge').textContent='(固定中)';
+    alert('DEBUG6: inf表示完了');
     fileToBase64(f,function(b64){if(b64)state.infImg=b64;});
   }else{
     document.getElementById('prod-img').src=blobUrl;
     document.getElementById('prod-upload').style.display='none';
     document.getElementById('prod-prev').style.display='block';
+    alert('DEBUG6: prod表示完了');
     fileToBase64(f,function(b64){
       if(b64){state.prodImg=b64;state.prodB64=b64;}
       if(state.pn.trim()&&b64)runAI(state.pn.trim(),b64);
