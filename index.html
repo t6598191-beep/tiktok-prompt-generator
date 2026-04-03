@@ -25,7 +25,7 @@ body{background:#0a0a0f;color:#f5f5f7;font-family:-apple-system,BlinkMacSystemFo
 
 .rule{margin:12px 14px;padding:14px;background:rgba(255,107,107,0.05);border:1px solid rgba(255,107,107,0.15);border-radius:12px}
 .rule-title{font-size:10px;font-weight:700;color:#ff6b6b;margin-bottom:6px}
-.rule-row{display:flex;gap:6px}
+.rule-row{display:-webkit-flex;display:flex;gap:6px}
 .rule-card{-webkit-flex:1;flex:1;background:rgba(0,0,0,0.3);border-radius:8px;padding:8px 4px;text-align:center}
 .rule-card .t{font-size:9px;color:#ff6b6b;font-weight:700}
 .rule-card .r{font-size:11px;font-weight:700;margin:2px 0}
@@ -36,12 +36,32 @@ body{background:#0a0a0f;color:#f5f5f7;font-family:-apple-system,BlinkMacSystemFo
 .img-slot{-webkit-flex:1;flex:1}
 .img-slot label{font-size:10px;font-weight:600;color:#999;display:block;margin-bottom:4px}
 .img-slot .badge{color:#ffa502;font-size:9px}
-.img-empty{height:90px;background:rgba(255,255,255,0.03);border:2px dashed rgba(255,255,255,0.12);border-radius:10px;display:-webkit-flex;display:flex;-webkit-flex-direction:column;flex-direction:column;-webkit-align-items:center;align-items:center;-webkit-justify-content:center;justify-content:center;cursor:pointer}
-.img-empty .ico{font-size:22px}
-.img-empty .ht{font-size:9px;color:#555;margin-top:2px}
+
+/* Safari-compatible upload button */
+.img-upload-btn{
+display:block;width:100%;height:90px;
+background:rgba(255,255,255,0.03);
+border:2px dashed rgba(255,255,255,0.12);
+border-radius:10px;
+color:#999;font-size:9px;
+text-align:center;
+cursor:pointer;
+-webkit-appearance:none;appearance:none;
+padding:0;margin:0;
+position:relative;
+}
+.img-upload-btn .ico{font-size:22px;display:block;margin-bottom:2px}
+.img-upload-btn .ht{font-size:9px;color:#555}
+.img-upload-btn input[type=file]{
+position:absolute;top:0;left:0;width:100%;height:100%;
+opacity:0;cursor:pointer;font-size:0;
+-webkit-appearance:none;
+}
+
 .img-prev{position:relative;height:90px;border-radius:10px;overflow:hidden;border:1px solid rgba(255,107,107,0.3)}
 .img-prev img{width:100%;height:100%;object-fit:cover}
-.img-prev button{position:absolute;top:3px;right:3px;background:rgba(0,0,0,0.7);border:none;color:#f66;border-radius:5px;width:22px;height:22px;font-size:13px;cursor:pointer;z-index:10}
+.img-prev button{position:absolute;top:3px;right:3px;background:rgba(0,0,0,0.7);border:none;color:#f66;border-radius:5px;width:28px;height:28px;font-size:15px;cursor:pointer;z-index:10;line-height:28px;text-align:center}
+
 .lbl{font-size:11px;font-weight:600;color:#999;display:block;margin-bottom:4px}
 input[type=text],select{width:100%;padding:10px 12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#f5f5f7;font-size:13px;outline:none;-webkit-appearance:none;appearance:none}
 .mb{margin-bottom:14px}
@@ -64,7 +84,6 @@ input[type=text],select{width:100%;padding:10px 12px;background:rgba(255,255,255
 .gemini-hint{font-size:10px;color:#a855f7;background:rgba(168,85,247,0.1);border-radius:8px;padding:8px 10px;margin-bottom:10px;line-height:1.5}
 .gemini-hint b{color:#c084fc}
 
-/* Generated image display */
 .gen-img-area{margin:10px 0;text-align:center}
 .gen-img-area img{max-width:100%;max-height:300px;border-radius:12px;border:2px solid rgba(168,85,247,0.3)}
 .gen-img-btn{width:100%;padding:10px;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;margin-top:8px;background:linear-gradient(135deg,#a855f7,#7c3aed);color:#fff;-webkit-transition:all 0.3s;transition:all 0.3s}
@@ -123,12 +142,10 @@ input[type=text],select{width:100%;padding:10px 12px;background:rgba(255,255,255
     <div class="img-slot">
       <label>👩 インフルエンサー <span class="badge" id="inf-badge"></span></label>
       <div id="inf-area"></div>
-      <input type="file" id="inf-input" accept="image/*" style="display:none">
     </div>
     <div class="img-slot">
       <label>📦 商品画像</label>
       <div id="prod-area"></div>
-      <input type="file" id="prod-input" accept="image/*" style="display:none">
     </div>
   </div>
 
@@ -188,7 +205,6 @@ function getApiKey(){return (document.getElementById('api-key').value||'').trim(
 async function callGemini(prompt,imgB64){
   var key=getApiKey();
   if(!key)throw new Error('Gemini API Keyを入力してください');
-
   var parts=[];
   if(imgB64){
     var mt='image/jpeg';
@@ -197,7 +213,6 @@ async function callGemini(prompt,imgB64){
     parts.push({inlineData:{mimeType:mt,data:imgB64.split(',')[1]}});
   }
   parts.push({text:prompt});
-
   var url='https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key='+key;
   var r=await fetch(url,{
     method:'POST',
@@ -214,7 +229,6 @@ async function callGemini(prompt,imgB64){
 async function callGeminiImage(prompt,refImgB64){
   var key=getApiKey();
   if(!key)throw new Error('Gemini API Keyを入力してください');
-
   var parts=[];
   if(refImgB64){
     var mt='image/jpeg';
@@ -222,7 +236,6 @@ async function callGeminiImage(prompt,refImgB64){
     parts.push({inlineData:{mimeType:mt,data:refImgB64.split(',')[1]}});
   }
   parts.push({text:prompt});
-
   var url='https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key='+key;
   var r=await fetch(url,{
     method:'POST',
@@ -235,14 +248,13 @@ async function callGeminiImage(prompt,refImgB64){
   var d=await r.json();
   if(d.error)throw new Error(d.error.message||JSON.stringify(d.error));
   if(!d.candidates||!d.candidates[0])throw new Error('画像生成に失敗しました');
-
   var resParts=d.candidates[0].content.parts;
   for(var i=0;i<resParts.length;i++){
     if(resParts[i].inlineData){
       return 'data:'+resParts[i].inlineData.mimeType+';base64,'+resParts[i].inlineData.data;
     }
   }
-  throw new Error('画像データが返されませんでした。Imagen/Gemini画像生成モデルが利用できない可能性があります。');
+  throw new Error('画像データが返されませんでした');
 }
 
 // ===== AI ANALYSIS =====
@@ -263,20 +275,13 @@ function runAI(name,imgB64){
     "商品名:「"+name+"」",
     "",
     "Task1 shortName: 2〜8文字に簡略化。修飾語・スペック・記号を全削除。",
-    "例:「9インチCarPlay車載ディスプレイ」→「車載ディスプレイ」「パンケーキミックス200g」→「パンケーキ」",
-    "",
     "Task2 category: food/beauty/health/gadget/home/fashion/other から1つ",
-    "",
-    "Task3 keyMerit: 商品名から読み取れる最大の特徴を具体的に（数字・成分・食感ワードを使う）",
-    "",
+    "Task3 keyMerit: 商品名から読み取れる最大の特徴を具体的に",
     "Task4 usageScene: 商品を使う自然なシーン1文",
-    "",
-    "Task5 セリフ3本",
-    "ルール: shortNameのみ使用 / タメ口女の子語尾 / keyMeritの具体ワードを必ず入れる",
+    "Task5 セリフ3本（shortNameのみ使用/タメ口女の子語尾/keyMeritの具体ワードを必ず入れる）",
     "禁止ワード: やばい・すごい・まじで・色々試した・効果が本当に・もう手放せない・実際使ってみたら・概念が変わった",
-    "",
     "hook(25〜45字): 商品の特徴を最初に言って「〜見て？」「〜知ってた？」「〜分かる？」で終わる",
-    "merit(30〜50字): keyMeritの体験を具体的に。禁止ワード不使用",
+    "merit(30〜50字): keyMeritの体験を具体的に",
     "close(20〜35字): 共感+説明欄誘導",
     "",
     "JSON: {\"shortName\":\"名\",\"category\":\"カテゴリ\",\"keyMerit\":\"魅力\",\"usageScene\":\"シーン\",\"hook\":\"セリフ\",\"merit\":\"セリフ\",\"close\":\"セリフ\"}"
@@ -292,7 +297,6 @@ function runAI(name,imgB64){
         if(p.hook||p.merit||p.close){state.sp={hook:p.hook||'',merit:p.merit||'',close:p.close||'',usageScene:p.usageScene||''};}
         if(p.usageScene){document.getElementById('scene-info').style.display='block';document.getElementById('scene-info').textContent='🎬 '+p.usageScene;}
         if(p.keyMerit){var mEl=document.getElementById('merit-info');mEl.style.display='block';mEl.textContent='✨ 訴求ポイント: '+p.keyMerit;}
-        // Update API status
         var apiSt=document.getElementById('api-status');
         apiSt.className='api-status ok';apiSt.textContent='✅ API接続OK';apiSt.style.display='block';
       }catch(e){console.error('parse',e,clean);}
@@ -341,18 +345,37 @@ function makePrompts(){
   return{promptThumb:pt,prompt1:p1,prompt2:p2,prompt3:p3,telop:telop,speech1:s1,speech2:s2,speech3:s3,cta:cta};
 }
 
-// ===== UI =====
-function delInf(){state.infImg=null;renderImg('inf-area',null,'inf-input');}
-function delProd(){state.prodImg=null;state.prodB64=null;renderImg('prod-area',null,'prod-input');}
-
-function renderImg(id,img,inputId){
-  var area=document.getElementById(id);var isInf=inputId==='inf-input';
+// ===== IMAGE UPLOAD (Safari-compatible) =====
+function renderImg(id,img,type){
+  var area=document.getElementById(id);
+  var isInf=(type==='inf');
   if(!img){
-    area.innerHTML='<div class="img-empty" onclick="document.getElementById(\''+inputId+'\').click()"><div class="ico">'+(isInf?'👩':'📦')+'</div><div class="ht">'+(isInf?'固定キャラ':'紹介する商品')+'</div></div>';
+    area.innerHTML='<label class="img-upload-btn"><span class="ico">'+(isInf?'👩':'📦')+'</span><span class="ht">'+(isInf?'タップして選択':'タップして選択')+'</span><input type="file" accept="image/*" onchange="handleFile(this,\''+type+'\')"></label>';
   }else{
-    area.innerHTML='<div class="img-prev"><img src="'+img+'"><button onclick="'+(isInf?'delInf()':'delProd()')+'">x</button></div>';
+    area.innerHTML='<div class="img-prev"><img src="'+img+'"><button type="button" onclick="delImg(\''+type+'\')">✕</button></div>';
   }
   if(isInf)document.getElementById('inf-badge').textContent=img?'(固定中)':'';
+}
+
+function handleFile(input,type){
+  var f=input.files[0];if(!f)return;
+  var r=new FileReader();
+  r.onloadend=function(){
+    if(type==='inf'){
+      state.infImg=r.result;
+      renderImg('inf-area',r.result,'inf');
+    }else{
+      state.prodImg=r.result;state.prodB64=r.result;
+      renderImg('prod-area',r.result,'prod');
+      if(state.pn.trim())runAI(state.pn.trim(),r.result);
+    }
+  };
+  r.readAsDataURL(f);
+}
+
+function delImg(type){
+  if(type==='inf'){state.infImg=null;renderImg('inf-area',null,'inf');}
+  else{state.prodImg=null;state.prodB64=null;renderImg('prod-area',null,'prod');}
 }
 
 function updateBtn(){
@@ -375,28 +398,18 @@ function copyText(text,btnEl){
   if(navigator.clipboard&&navigator.clipboard.writeText){
     navigator.clipboard.writeText(text).then(function(){
       showCopied(btnEl);
-    }).catch(function(){
-      fallbackCopy(text,btnEl);
-    });
-  }else{
-    fallbackCopy(text,btnEl);
-  }
+    }).catch(function(){fallbackCopy(text,btnEl);});
+  }else{fallbackCopy(text,btnEl);}
 }
-
 function fallbackCopy(text,btnEl){
   var ta=document.createElement('textarea');
-  ta.value=text;
-  ta.style.cssText='position:fixed;left:-9999px;top:-9999px;opacity:0';
-  document.body.appendChild(ta);
-  ta.focus();
-  ta.setSelectionRange(0,ta.value.length);
-  var ok=false;
-  try{ok=document.execCommand('copy');}catch(e){}
+  ta.value=text;ta.style.cssText='position:fixed;left:-9999px;top:-9999px;opacity:0';
+  document.body.appendChild(ta);ta.focus();ta.setSelectionRange(0,ta.value.length);
+  var ok=false;try{ok=document.execCommand('copy');}catch(e){}
   document.body.removeChild(ta);
-  if(ok){showCopied(btnEl);}
+  if(ok)showCopied(btnEl);
   else{btnEl.textContent='長押しコピー';setTimeout(function(){btnEl.textContent='コピー';},2000);}
 }
-
 function showCopied(btnEl){
   btnEl.textContent='OK!';btnEl.style.background='#27ae60';btnEl.style.color='#fff';
   setTimeout(function(){btnEl.textContent='コピー';btnEl.style.background='rgba(255,255,255,0.08)';btnEl.style.color='#aaa';},1500);
@@ -408,21 +421,14 @@ function generateImage(promptId){
   var btn=document.getElementById('imgbtn-'+promptId);
   var area=document.getElementById('imgarea-'+promptId);
   btn.disabled=true;btn.textContent='🎨 画像生成中...';btn.className='gen-img-btn loading';
-
-  // Combine reference images if available
   var refImg=state.infImg||state.prodImg||null;
-
   callGeminiImage(prompt,refImg)
     .then(function(dataUrl){
       area.innerHTML='<img src="'+dataUrl+'" alt="Generated image">';
-      // Download button
       var dlBtn=document.createElement('a');
-      dlBtn.className='gen-img-dl';
-      dlBtn.textContent='📥 画像をダウンロード';
-      dlBtn.href=dataUrl;
-      dlBtn.download='tiktok-thumb-'+Date.now()+'.png';
-      area.appendChild(document.createElement('br'));
-      area.appendChild(dlBtn);
+      dlBtn.className='gen-img-dl';dlBtn.textContent='📥 画像をダウンロード';
+      dlBtn.href=dataUrl;dlBtn.download='tiktok-thumb-'+Date.now()+'.png';
+      area.appendChild(document.createElement('br'));area.appendChild(dlBtn);
       btn.textContent='🔄 再生成';btn.className='gen-img-btn';btn.disabled=false;
     })
     .catch(function(e){
@@ -437,32 +443,24 @@ function escH(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/
 function renderResults(r){
   state.lastResults=r;
   var h='';
-
-  // Gemini image prompt section
   h+='<div class="img-prompt-sec">';
   h+='<div class="img-prompt-hdr"><span class="tt">🖼 冒頭画像プロンプト</span><span class="step">① Geminiで画像生成</span></div>';
-  h+='<div class="gemini-hint">👉 下の「画像を生成」ボタンで<b>Gemini API</b>から直接画像生成できます。またはコピーして <b>aistudio.google.com</b> に貼り付けも可</div>';
+  h+='<div class="gemini-hint">👉 下の「画像を生成」ボタンで<b>Gemini API</b>から直接画像生成できます</div>';
   h+=boxWithImgGen('IMAGE','Gemini用・冒頭フレーム',r.promptThumb,'#a855f7',0);
   h+='</div>';
-
-  // Speech preview
   h+='<div class="preview"><div class="prev-row"><div><div class="ll" style="color:#ff6b6b">TELOP</div><div style="font-size:14px;font-weight:700;color:#ff6b6b;margin-top:2px">「'+escH(r.telop)+'」</div></div><div><div class="ll" style="color:#2ed573">CTA（左下）</div><div style="font-size:12px;font-weight:600;color:#2ed573;margin-top:2px">'+escH(r.cta)+'</div></div></div>';
   h+='<div class="speech-sec"><div class="ll">セリフ</div>';
   [{l:"冒頭",t:r.speech1,c:"#ff6b6b"},{l:"中盤",t:r.speech2,c:"#ffa502"},{l:"締め",t:r.speech3,c:"#2ed573"}].forEach(function(x){
     h+='<div class="speech-line"><span class="la" style="color:'+x.c+'">'+x.l+'</span><span class="tx">'+escH(x.t)+'</span></div>';
   });
   h+='</div></div>';
-
-  // Grok video prompts
   h+='<div class="sec-title">動画プロンプト（Grokに貼り付け）</div>';
   h+=box('PART1','フック(0-10秒)',r.prompt1,'#ff6b6b',1);
   h+=box('PART2','使用シーン(10-20秒)',r.prompt2,'#ffa502',2);
   h+=box('PART3','CTA(20-30秒)',r.prompt3,'#2ed573',3);
   h+='<button class="regen" onclick="generate()">別パターンで再生成</button>';
-
   var el=document.getElementById('results');
   el.style.display='block';el.innerHTML=h;
-  // scroll to results
   el.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
@@ -482,8 +480,7 @@ return ‘<div class="copy-box" style="background:'+color+'11;border:1px solid '
 ‘<button class="copy-btn" style="background:rgba(255,255,255,0.08);color:#aaa" onclick="copyText(document.getElementById(\'pre'+idx+'\').textContent,this)">コピー</button></div>’+
 ‘<pre class="copy-pre" id="pre'+idx+'">’+esc+’</pre>’+
 ‘<div id="imgarea-pre'+idx+'" class="gen-img-area"></div>’+
-‘<button id="imgbtn-pre'+idx+'" class="gen-img-btn" onclick="generateImage(\'pre'+idx+'\')">🎨 Geminiで画像を生成</button>’+
-‘</div>’;
+‘<button id="imgbtn-pre'+idx+'" class="gen-img-btn" onclick="generateImage(\'pre'+idx+'\')">🎨 Geminiで画像を生成</button></div>’;
 }
 
 function generate(){
@@ -493,37 +490,17 @@ setTimeout(function(){var r=makePrompts();renderResults(r);state.busy=false;upda
 }
 
 // ===== SAVE/RESTORE API KEY =====
-function saveApiKey(key){
-try{localStorage.setItem(‘gemini_api_key’,key);}catch(e){}
-}
-function loadApiKey(){
-try{return localStorage.getItem(‘gemini_api_key’)||’’;}catch(e){return ‘’;}
-}
+function saveApiKey(key){try{localStorage.setItem(‘gemini_api_key’,key);}catch(e){}}
+function loadApiKey(){try{return localStorage.getItem(‘gemini_api_key’)||’’;}catch(e){return ‘’;}}
 
 // ===== INIT =====
-renderImg(‘inf-area’,null,‘inf-input’);
-renderImg(‘prod-area’,null,‘prod-input’);
+renderImg(‘inf-area’,null,‘inf’);
+renderImg(‘prod-area’,null,‘prod’);
 
-// Restore API key
 var savedKey=loadApiKey();
 if(savedKey)document.getElementById(‘api-key’).value=savedKey;
 
-document.getElementById(‘api-key’).addEventListener(‘input’,function(e){
-saveApiKey(e.target.value);updateBtn();
-});
-
-document.getElementById(‘inf-input’).addEventListener(‘change’,function(e){
-var f=e.target.files[0];if(!f)return;
-var r=new FileReader();r.onloadend=function(){state.infImg=r.result;renderImg(‘inf-area’,r.result,‘inf-input’);};r.readAsDataURL(f);
-});
-document.getElementById(‘prod-input’).addEventListener(‘change’,function(e){
-var f=e.target.files[0];if(!f)return;
-var r=new FileReader();r.onloadend=function(){
-state.prodImg=r.result;state.prodB64=r.result;
-renderImg(‘prod-area’,r.result,‘prod-input’);
-if(state.pn.trim())runAI(state.pn.trim(),r.result);
-};r.readAsDataURL(f);
-});
+document.getElementById(‘api-key’).addEventListener(‘input’,function(e){saveApiKey(e.target.value);updateBtn();});
 document.getElementById(‘pn-input’).addEventListener(‘input’,function(e){
 state.pn=e.target.value;updateBtn();clearTimeout(timer);
 if(state.pn.trim().length>=2){timer=setTimeout(function(){runAI(state.pn.trim(),state.prodB64);},1200);}
