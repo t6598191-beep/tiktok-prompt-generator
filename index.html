@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Grok Prompt Generator</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:#0a0a0f;color:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Hiragino Kaku Gothic ProN',sans-serif;min-height:100vh;min-height:-webkit-fill-available}
+
+.hdr{background:linear-gradient(135deg,#1a1a2e,#0f3460);padding:24px 16px 20px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.06)}
+.hdr .sub{font-size:9px;font-weight:700;letter-spacing:3px;color:#ff6b6b;text-transform:uppercase;margin-bottom:6px}
+.hdr h1{font-size:20px;font-weight:900;color:#fff;line-height:1.3}
+.hdr p{font-size:11px;color:#888;margin-top:6px}
+
+.api-bar{margin:12px 14px;padding:12px;background:rgba(168,85,247,0.06);border:1px solid rgba(168,85,247,0.2);border-radius:12px}
+.api-bar .lbl{font-size:10px;font-weight:700;color:#a855f7;margin-bottom:4px;display:block}
+.api-bar input{width:100%;padding:8px 10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#f5f5f7;font-size:12px;outline:none;font-family:monospace}
+.api-bar .hint{font-size:9px;color:#777;margin-top:4px}
+.api-bar .hint a{color:#a855f7;text-decoration:none}
+.api-status{font-size:10px;margin-top:4px;display:none}
+.api-status.ok{color:#2ed573;display:block}
+.api-status.err{color:#ff6b6b;display:block}
+
+.rule{margin:12px 14px;padding:14px;background:rgba(255,107,107,0.05);border:1px solid rgba(255,107,107,0.15);border-radius:12px}
+.rule-title{font-size:10px;font-weight:700;color:#ff6b6b;margin-bottom:6px}
+.rule-row{display:flex;gap:6px}
+.rule-card{-webkit-flex:1;flex:1;background:rgba(0,0,0,0.3);border-radius:8px;padding:8px 4px;text-align:center}
+.rule-card .t{font-size:9px;color:#ff6b6b;font-weight:700}
+.rule-card .r{font-size:11px;font-weight:700;margin:2px 0}
+.rule-card .d{font-size:8px;color:#777}
+
+.wrap{padding:14px}
+.imgs{display:-webkit-flex;display:flex;gap:10px;margin-bottom:14px}
+.img-slot{-webkit-flex:1;flex:1}
+.img-slot label{font-size:10px;font-weight:600;color:#999;display:block;margin-bottom:4px}
+.img-slot .badge{color:#ffa502;font-size:9px}
+.img-empty{height:90px;background:rgba(255,255,255,0.03);border:2px dashed rgba(255,255,255,0.12);border-radius:10px;display:-webkit-flex;display:flex;-webkit-flex-direction:column;flex-direction:column;-webkit-align-items:center;align-items:center;-webkit-justify-content:center;justify-content:center;cursor:pointer}
+.img-empty .ico{font-size:22px}
+.img-empty .ht{font-size:9px;color:#555;margin-top:2px}
+.img-prev{position:relative;height:90px;border-radius:10px;overflow:hidden;border:1px solid rgba(255,107,107,0.3)}
+.img-prev img{width:100%;height:100%;object-fit:cover}
+.img-prev button{position:absolute;top:3px;right:3px;background:rgba(0,0,0,0.7);border:none;color:#f66;border-radius:5px;width:22px;height:22px;font-size:13px;cursor:pointer;z-index:10}
+.lbl{font-size:11px;font-weight:600;color:#999;display:block;margin-bottom:4px}
+input[type=text],select{width:100%;padding:10px 12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#f5f5f7;font-size:13px;outline:none;-webkit-appearance:none;appearance:none}
+.mb{margin-bottom:14px}
+.ai-status{margin-top:6px;font-size:11px;color:#ffa502}
+.sn-row{margin-top:6px;display:-webkit-flex;display:flex;-webkit-align-items:center;align-items:center;gap:6px;-webkit-flex-wrap:wrap;flex-wrap:wrap}
+.sn-row .tag{font-size:12px;font-weight:700;color:#a855f7;background:rgba(168,85,247,0.1);padding:2px 8px;border-radius:6px}
+.sn-row input{-webkit-flex:1;flex:1;min-width:60px;padding:3px 6px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#f5f5f7;font-size:11px;outline:none}
+.scene-info{margin-top:4px;font-size:10px;color:#ffa502}
+.merit-info{margin-top:4px;font-size:10px;color:#2ed573;background:rgba(46,213,115,0.07);border-radius:6px;padding:4px 8px;display:none}
+.gen-btn{width:100%;padding:13px;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;-webkit-transition:all 0.3s;transition:all 0.3s}
+.gen-btn.on{background:linear-gradient(135deg,#ff6b6b,#ee5a24);color:#fff}
+.gen-btn.off{background:rgba(255,255,255,0.05);color:#555;cursor:default}
+
+.results{padding:16px 14px 40px}
+
+.img-prompt-sec{background:rgba(168,85,247,0.07);border:2px solid rgba(168,85,247,0.35);border-radius:14px;padding:16px;margin-bottom:16px}
+.img-prompt-hdr{display:-webkit-flex;display:flex;-webkit-justify-content:space-between;justify-content:space-between;-webkit-align-items:center;align-items:center;margin-bottom:10px}
+.img-prompt-hdr .tt{font-size:12px;font-weight:700;color:#a855f7}
+.img-prompt-hdr .step{font-size:10px;color:#888;background:rgba(255,255,255,0.05);padding:3px 8px;border-radius:6px}
+.gemini-hint{font-size:10px;color:#a855f7;background:rgba(168,85,247,0.1);border-radius:8px;padding:8px 10px;margin-bottom:10px;line-height:1.5}
+.gemini-hint b{color:#c084fc}
+
+/* Generated image display */
+.gen-img-area{margin:10px 0;text-align:center}
+.gen-img-area img{max-width:100%;max-height:300px;border-radius:12px;border:2px solid rgba(168,85,247,0.3)}
+.gen-img-btn{width:100%;padding:10px;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;margin-top:8px;background:linear-gradient(135deg,#a855f7,#7c3aed);color:#fff;-webkit-transition:all 0.3s;transition:all 0.3s}
+.gen-img-btn:disabled{opacity:0.4;cursor:default}
+.gen-img-btn.loading{background:rgba(168,85,247,0.3);color:#a855f7}
+.gen-img-dl{display:inline-block;margin-top:6px;padding:6px 16px;background:rgba(46,213,115,0.15);color:#2ed573;border:1px solid rgba(46,213,115,0.3);border-radius:8px;font-size:11px;font-weight:600;text-decoration:none;cursor:pointer}
+
+.preview{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px 14px;margin-bottom:14px}
+.prev-row{display:-webkit-flex;display:flex;gap:10px;margin-bottom:10px}
+.prev-row>div{-webkit-flex:1;flex:1}
+.prev-row .ll{font-size:8px;font-weight:700;margin-bottom:2px}
+.speech-sec{border-top:1px solid rgba(255,255,255,0.06);padding-top:8px}
+.speech-sec .ll{font-size:8px;font-weight:700;color:#a855f7;margin-bottom:4px}
+.speech-line{display:-webkit-flex;display:flex;gap:6px;margin-bottom:4px}
+.speech-line .la{font-size:9px;font-weight:700;min-width:24px}
+.speech-line .tx{font-size:11px;color:#ccc;line-height:1.4}
+
+.copy-box{border-radius:14px;padding:16px;margin-bottom:14px}
+.copy-hdr{display:-webkit-flex;display:flex;-webkit-justify-content:space-between;justify-content:space-between;-webkit-align-items:center;align-items:center;margin-bottom:10px}
+.copy-hdr .left{display:-webkit-flex;display:flex;-webkit-align-items:center;align-items:center;gap:8px}
+.copy-hdr .tag{color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px}
+.copy-hdr .sub{color:#888;font-size:11px}
+.copy-btn{border:none;border-radius:8px;padding:5px 14px;font-size:11px;font-weight:600;cursor:pointer}
+.copy-pre{color:#ddd;font-size:11px;line-height:1.6;white-space:pre-wrap;word-break:break-word;font-family:monospace;margin:0;padding:10px;background:rgba(0,0,0,0.3);border-radius:8px;max-height:180px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.regen{width:100%;padding:10px;background:rgba(255,255,255,0.04);color:#888;border:1px solid rgba(255,255,255,0.1);border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;margin-top:4px}
+.sec-title{font-size:10px;font-weight:700;color:#777;margin-bottom:8px}
+</style>
+
+</head>
+<body>
+
+<div class="hdr">
+  <div class="sub">GROK PROMPT GENERATOR</div>
+  <h1>TikTokバズ動画<br>プロンプト生成</h1>
+  <p>フック → 使用シーン → 説明欄CTA</p>
+</div>
+
+<div class="api-bar">
+  <label class="lbl" style="color:#a855f7">🔑 Gemini API Key</label>
+  <input type="text" id="api-key" placeholder="AIzaSy..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+  <div class="hint">👉 <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com/apikey</a> で無料取得</div>
+  <div id="api-status" class="api-status"></div>
+</div>
+
+<div class="rule">
+  <div class="rule-title">動画構成</div>
+  <div class="rule-row">
+    <div class="rule-card"><div class="t">0-10秒</div><div class="r">フック</div><div class="d">テロップ+セリフ</div></div>
+    <div class="rule-card"><div class="t">10-20秒</div><div class="r">使用シーン</div><div class="d">実際に使う映像</div></div>
+    <div class="rule-card"><div class="t">20-30秒</div><div class="r">CTA</div><div class="d">説明欄誘導</div></div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="imgs">
+    <div class="img-slot">
+      <label>👩 インフルエンサー <span class="badge" id="inf-badge"></span></label>
+      <div id="inf-area"></div>
+      <input type="file" id="inf-input" accept="image/*" style="display:none">
+    </div>
+    <div class="img-slot">
+      <label>📦 商品画像</label>
+      <div id="prod-area"></div>
+      <input type="file" id="prod-input" accept="image/*" style="display:none">
+    </div>
+  </div>
+
+  <div class="mb">
+    <div class="lbl">商品名（タイトル貼付）*</div>
+    <input type="text" id="pn-input" placeholder="例: パンケーキミックス ふわふわ 200g...">
+    <div id="ai-status" class="ai-status" style="display:none"></div>
+    <div id="sn-row" class="sn-row" style="display:none">
+      <span style="font-size:10px;color:#888">セリフ用:</span>
+      <span class="tag" id="sn-tag"></span>
+      <input type="text" id="sn-input" placeholder="変更可">
+    </div>
+    <div id="scene-info" class="scene-info" style="display:none"></div>
+    <div id="merit-info" class="merit-info"></div>
+  </div>
+
+  <div class="mb">
+    <div class="lbl">女性スタイル</div>
+    <select id="style-sel">
+      <option value="清楚系">清楚系</option>
+      <option value="大人キレイ系" selected>大人キレイ系</option>
+      <option value="韓国系">韓国系</option>
+      <option value="小悪魔系">小悪魔系</option>
+    </select>
+  </div>
+
+<button class="gen-btn off" id="gen-btn" disabled>🎬 プロンプト生成</button>
+
+</div>
+
+<div id="results" class="results" style="display:none"></div>
+
+<script>
+var TELOPS=["まだ知らないの？","え、これ知ってる？","正直これなしじゃ無理","もっと早く知りたかった","これ1つで全部解決","3日で変わった…","ガチで毎日使ってる","教えたくなかったけど…","概念変わるよこれ","知らないと損してる","やばいの見つけた","マジで人生変わる","これ以外考えられない","1回使ったら戻れない"];
+var CTAS=["気になる人は説明欄から","詳細は説明欄をチェック","説明欄にリンク貼ってます","これマジでおすすめ→説明欄","在庫なくなる前に→説明欄"];
+function pick(a){return a[Math.floor(Math.random()*a.length)];}
+
+var STYLES={
+  "清楚系":"清楚で可愛い日本人女性（黒髪ロング、ナチュラルメイク、白い肌、清潔感のあるカジュアル服装）",
+  "大人キレイ系":"大人っぽく綺麗な日本人女性（ゆるウェーブヘア、艶やかなメイク、おしゃれな服装）",
+  "韓国系":"韓国風の美しい日本人女性（ストレートヘア、透明感のある肌、水光メイク、トレンド韓国ファッション）",
+  "小悪魔系":"小悪魔系の可愛い日本人女性（ミディアムヘア、上目遣い、甘えた表情、キャミソールやオフショルダー）"
+};
+var STYLES_EN={
+  "清楚系":"beautiful Japanese woman, long straight black hair, natural makeup, fair skin, stylish casual outfit, clean and elegant look",
+  "大人キレイ系":"beautiful mature Japanese woman, wavy brown hair, glamorous makeup, fashionable outfit, sophisticated and elegant",
+  "韓国系":"beautiful Korean-style Japanese woman, sleek straight hair, luminous glass skin, trendy Korean fashion, elegant and stylish",
+  "小悪魔系":"cute playful Japanese woman, medium length hair, charming coy smile, trendy off-shoulder or camisole top, youthful and energetic"
+};
+
+var state={pn:"",sn:"",st:"大人キレイ系",infImg:null,prodImg:null,prodB64:null,sp:null,aiLoading:false,busy:false,lastResults:null};
+var timer=null;
+
+function getApiKey(){return (document.getElementById('api-key').value||'').trim();}
+
+// ===== GEMINI API =====
+async function callGemini(prompt,imgB64){
+  var key=getApiKey();
+  if(!key)throw new Error('Gemini API Keyを入力してください');
+
+  var parts=[];
+  if(imgB64){
+    var mt='image/jpeg';
+    if(imgB64.indexOf('data:image/png')>=0)mt='image/png';
+    else if(imgB64.indexOf('data:image/webp')>=0)mt='image/webp';
+    parts.push({inlineData:{mimeType:mt,data:imgB64.split(',')[1]}});
+  }
+  parts.push({text:prompt});
+
+  var url='https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key='+key;
+  var r=await fetch(url,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({contents:[{parts:parts}],generationConfig:{temperature:0.9,maxOutputTokens:1024}})
+  });
+  var d=await r.json();
+  if(d.error)throw new Error(d.error.message||JSON.stringify(d.error));
+  if(!d.candidates||!d.candidates[0])throw new Error('レスポンスが空です');
+  return d.candidates[0].content.parts[0].text;
+}
+
+// ===== GEMINI IMAGE GENERATION =====
+async function callGeminiImage(prompt,refImgB64){
+  var key=getApiKey();
+  if(!key)throw new Error('Gemini API Keyを入力してください');
+
+  var parts=[];
+  if(refImgB64){
+    var mt='image/jpeg';
+    if(refImgB64.indexOf('data:image/png')>=0)mt='image/png';
+    parts.push({inlineData:{mimeType:mt,data:refImgB64.split(',')[1]}});
+  }
+  parts.push({text:prompt});
+
+  var url='https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key='+key;
+  var r=await fetch(url,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      contents:[{parts:parts}],
+      generationConfig:{responseModalities:["TEXT","IMAGE"],temperature:1.0,maxOutputTokens:1024}
+    })
+  });
+  var d=await r.json();
+  if(d.error)throw new Error(d.error.message||JSON.stringify(d.error));
+  if(!d.candidates||!d.candidates[0])throw new Error('画像生成に失敗しました');
+
+  var resParts=d.candidates[0].content.parts;
+  for(var i=0;i<resParts.length;i++){
+    if(resParts[i].inlineData){
+      return 'data:'+resParts[i].inlineData.mimeType+';base64,'+resParts[i].inlineData.data;
+    }
+  }
+  throw new Error('画像データが返されませんでした。Imagen/Gemini画像生成モデルが利用できない可能性があります。');
+}
+
+// ===== AI ANALYSIS =====
+function runAI(name,imgB64){
+  if(!name||name.length<2)return;
+  if(!getApiKey()){
+    document.getElementById('ai-status').style.display='block';
+    document.getElementById('ai-status').textContent='⚠️ Gemini API Keyを入力してください';
+    return;
+  }
+  state.aiLoading=true;updateBtn();
+  document.getElementById('ai-status').style.display='block';
+  document.getElementById('ai-status').textContent='🔍 Gemini分析中...';
+  document.getElementById('merit-info').style.display='none';
+
+  var prompt=[
+    "JSONのみ回答。Markdownコードブロック不要。余計な説明不要。",
+    "商品名:「"+name+"」",
+    "",
+    "Task1 shortName: 2〜8文字に簡略化。修飾語・スペック・記号を全削除。",
+    "例:「9インチCarPlay車載ディスプレイ」→「車載ディスプレイ」「パンケーキミックス200g」→「パンケーキ」",
+    "",
+    "Task2 category: food/beauty/health/gadget/home/fashion/other から1つ",
+    "",
+    "Task3 keyMerit: 商品名から読み取れる最大の特徴を具体的に（数字・成分・食感ワードを使う）",
+    "",
+    "Task4 usageScene: 商品を使う自然なシーン1文",
+    "",
+    "Task5 セリフ3本",
+    "ルール: shortNameのみ使用 / タメ口女の子語尾 / keyMeritの具体ワードを必ず入れる",
+    "禁止ワード: やばい・すごい・まじで・色々試した・効果が本当に・もう手放せない・実際使ってみたら・概念が変わった",
+    "",
+    "hook(25〜45字): 商品の特徴を最初に言って「〜見て？」「〜知ってた？」「〜分かる？」で終わる",
+    "merit(30〜50字): keyMeritの体験を具体的に。禁止ワード不使用",
+    "close(20〜35字): 共感+説明欄誘導",
+    "",
+    "JSON: {\"shortName\":\"名\",\"category\":\"カテゴリ\",\"keyMerit\":\"魅力\",\"usageScene\":\"シーン\",\"hook\":\"セリフ\",\"merit\":\"セリフ\",\"close\":\"セリフ\"}"
+  ].join("\n");
+
+  callGemini(prompt,imgB64)
+    .then(function(raw){
+      var clean=raw.replace(/```json\n?|```/g,'').trim();
+      var m=clean.match(/\{[\s\S]*\}/);if(m)clean=m[0];
+      try{
+        var p=JSON.parse(clean);
+        if(p.shortName){state.sn=p.shortName;showSN();}
+        if(p.hook||p.merit||p.close){state.sp={hook:p.hook||'',merit:p.merit||'',close:p.close||'',usageScene:p.usageScene||''};}
+        if(p.usageScene){document.getElementById('scene-info').style.display='block';document.getElementById('scene-info').textContent='🎬 '+p.usageScene;}
+        if(p.keyMerit){var mEl=document.getElementById('merit-info');mEl.style.display='block';mEl.textContent='✨ 訴求ポイント: '+p.keyMerit;}
+        // Update API status
+        var apiSt=document.getElementById('api-status');
+        apiSt.className='api-status ok';apiSt.textContent='✅ API接続OK';apiSt.style.display='block';
+      }catch(e){console.error('parse',e,clean);}
+      state.aiLoading=false;
+      document.getElementById('ai-status').style.display='none';
+      updateBtn();
+    })
+    .catch(function(e){
+      document.getElementById('ai-status').textContent='⚠️ '+e.message;
+      var apiSt=document.getElementById('api-status');
+      apiSt.className='api-status err';apiSt.textContent='❌ '+e.message;apiSt.style.display='block';
+      state.aiLoading=false;updateBtn();
+    });
+}
+
+// ===== GEMINI IMAGE PROMPT =====
+function makeImagePrompt(){
+  var d=state.sn||'product';
+  var se=STYLES_EN[state.st]||STYLES_EN['大人キレイ系'];
+  var ir=state.infImg?'IMPORTANT: Use the person in the reference photo as the model, reproduce their face, hair and body exactly. ':'';
+  var pr=state.prodImg?'The product in the reference photo should appear in her hand, reproduce its design, color and shape accurately. ':'';
+  return 'Photorealistic vertical portrait photo, 9:16 aspect ratio, 1080x1920px.\n'+ir+pr+
+    'Subject: '+se+'. She holds '+d+' near her chest, looking at camera with a charming confident smile.\n'+
+    'Composition: upper body to thighs, subject slightly left of center, product on right side, 20% empty space at top.\n'+
+    'Background: bright indoor, white or beige wall, natural window light, beautiful soft bokeh.\n'+
+    'Lighting: soft warm cinematic light, shallow depth of field.\n'+
+    'Quality: ultra-high resolution, photorealistic, 4K, magazine quality. First frame of TikTok video.';
+}
+
+// ===== GROK PROMPTS =====
+function makePrompts(){
+  var d=state.sn||'これ';var pn=state.pn;var st=state.st;var sp=state.sp;
+  var telop=pick(TELOPS);var cta=pick(CTAS);
+  var s1=(sp&&sp.hook)||'これが気になりすぎて試してみたから見て？';
+  var s2=(sp&&sp.merit)||'使い始めて分かったんだけど、全然違ったの。';
+  var s3=(sp&&sp.close)||'気になった人は説明欄からチェックしてみて。';
+  var us=(sp&&sp.usageScene)||'女性が商品を実際に使用しているシーン';
+  var sd=STYLES[st]||STYLES['大人キレイ系'];
+  var inf=state.infImg?'\n\nINFLUENCER: 添付のインフルエンサー写真の人物の顔・髪型・体型を忠実に再現すること。':'';
+  var pr=state.prodImg?'\n\nPRODUCT IMAGE: 添付の商品画像のデザイン・色・形・ロゴを忠実に再現すること。':'';
+  var ref='\n\n[PRODUCT]\nFull: '+pn+'\nSpeak as: '+d+' ONLY.';
+  var p1='Generate a 10-second vertical video (9:16).\n\nScene: '+sd+' が画面に向かって語りかけている。おしゃれな服装。明るい室内。\n\nSpeech: 「'+s1+'」\n驚きから笑顔へ。髪をかき上げる仕草。\n\nTelop: 「'+telop+'」を画面中央上部に大きく表示。太ゴシック白文字黒縁取り。\n\nStyle: Cinematic, soft lighting, shallow DOF, warm. 9:16, photorealistic.'+inf+pr+ref;
+  var p2='Generate a 10-second vertical video (9:16).\n\nScene: '+sd+' が「'+d+'」を使用中。\n使用シーン: '+us+'\n\nAction:\n1. (0-3s) 商品を手に取る\n2. (3-7s) 実際に使用中クローズアップ\n3. (7-10s) 満足リアクション\n\nSpeech: 「'+s2+'」\nTelop: なし。9:16, photorealistic.'+inf+pr+ref;
+  var p3='Generate a 10-second vertical video (9:16).\n\nScene: '+sd+' が「'+d+'」を手に持ち甘い笑顔。背景ボケ。\n\nSpeech: 「'+s3+'」\n最後にウィンク。商品を胸元の高さに。\n\nTelop: 画面左下に「'+cta+'」を最後3秒のみ。小さめ白文字。\nStyle: Golden hour, bokeh. 9:16, photorealistic.'+inf+pr+ref;
+  var pt=makeImagePrompt();
+  return{promptThumb:pt,prompt1:p1,prompt2:p2,prompt3:p3,telop:telop,speech1:s1,speech2:s2,speech3:s3,cta:cta};
+}
+
+// ===== UI =====
+function delInf(){state.infImg=null;renderImg('inf-area',null,'inf-input');}
+function delProd(){state.prodImg=null;state.prodB64=null;renderImg('prod-area',null,'prod-input');}
+
+function renderImg(id,img,inputId){
+  var area=document.getElementById(id);var isInf=inputId==='inf-input';
+  if(!img){
+    area.innerHTML='<div class="img-empty" onclick="document.getElementById(\''+inputId+'\').click()"><div class="ico">'+(isInf?'👩':'📦')+'</div><div class="ht">'+(isInf?'固定キャラ':'紹介する商品')+'</div></div>';
+  }else{
+    area.innerHTML='<div class="img-prev"><img src="'+img+'"><button onclick="'+(isInf?'delInf()':'delProd()')+'">x</button></div>';
+  }
+  if(isInf)document.getElementById('inf-badge').textContent=img?'(固定中)':'';
+}
+
+function updateBtn(){
+  var btn=document.getElementById('gen-btn');
+  var ok=state.pn.trim()&&!state.busy&&!state.aiLoading&&getApiKey();
+  btn.disabled=!ok;btn.className='gen-btn '+(ok?'on':'off');
+  if(state.aiLoading)btn.textContent='🔍 Gemini分析中...';
+  else if(state.busy)btn.textContent='⏳ 生成中...';
+  else btn.textContent='🎬 プロンプト生成';
+}
+
+function showSN(){
+  document.getElementById('sn-row').style.display='flex';
+  document.getElementById('sn-tag').textContent='「'+state.sn+'」';
+  document.getElementById('sn-input').value=state.sn;
+}
+
+// Safari-compatible copy
+function copyText(text,btnEl){
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){
+      showCopied(btnEl);
+    }).catch(function(){
+      fallbackCopy(text,btnEl);
+    });
+  }else{
+    fallbackCopy(text,btnEl);
+  }
+}
+
+function fallbackCopy(text,btnEl){
+  var ta=document.createElement('textarea');
+  ta.value=text;
+  ta.style.cssText='position:fixed;left:-9999px;top:-9999px;opacity:0';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.setSelectionRange(0,ta.value.length);
+  var ok=false;
+  try{ok=document.execCommand('copy');}catch(e){}
+  document.body.removeChild(ta);
+  if(ok){showCopied(btnEl);}
+  else{btnEl.textContent='長押しコピー';setTimeout(function(){btnEl.textContent='コピー';},2000);}
+}
+
+function showCopied(btnEl){
+  btnEl.textContent='OK!';btnEl.style.background='#27ae60';btnEl.style.color='#fff';
+  setTimeout(function(){btnEl.textContent='コピー';btnEl.style.background='rgba(255,255,255,0.08)';btnEl.style.color='#aaa';},1500);
+}
+
+// ===== GENERATE IMAGE =====
+function generateImage(promptId){
+  var prompt=document.getElementById(promptId).textContent;
+  var btn=document.getElementById('imgbtn-'+promptId);
+  var area=document.getElementById('imgarea-'+promptId);
+  btn.disabled=true;btn.textContent='🎨 画像生成中...';btn.className='gen-img-btn loading';
+
+  // Combine reference images if available
+  var refImg=state.infImg||state.prodImg||null;
+
+  callGeminiImage(prompt,refImg)
+    .then(function(dataUrl){
+      area.innerHTML='<img src="'+dataUrl+'" alt="Generated image">';
+      // Download button
+      var dlBtn=document.createElement('a');
+      dlBtn.className='gen-img-dl';
+      dlBtn.textContent='📥 画像をダウンロード';
+      dlBtn.href=dataUrl;
+      dlBtn.download='tiktok-thumb-'+Date.now()+'.png';
+      area.appendChild(document.createElement('br'));
+      area.appendChild(dlBtn);
+      btn.textContent='🔄 再生成';btn.className='gen-img-btn';btn.disabled=false;
+    })
+    .catch(function(e){
+      area.innerHTML='<div style="color:#ff6b6b;font-size:11px;padding:8px">⚠️ '+escH(e.message)+'</div>';
+      btn.textContent='🎨 リトライ';btn.className='gen-img-btn';btn.disabled=false;
+    });
+}
+
+// ===== RESULTS =====
+function escH(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+
+function renderResults(r){
+  state.lastResults=r;
+  var h='';
+
+  // Gemini image prompt section
+  h+='<div class="img-prompt-sec">';
+  h+='<div class="img-prompt-hdr"><span class="tt">🖼 冒頭画像プロンプト</span><span class="step">① Geminiで画像生成</span></div>';
+  h+='<div class="gemini-hint">👉 下の「画像を生成」ボタンで<b>Gemini API</b>から直接画像生成できます。またはコピーして <b>aistudio.google.com</b> に貼り付けも可</div>';
+  h+=boxWithImgGen('IMAGE','Gemini用・冒頭フレーム',r.promptThumb,'#a855f7',0);
+  h+='</div>';
+
+  // Speech preview
+  h+='<div class="preview"><div class="prev-row"><div><div class="ll" style="color:#ff6b6b">TELOP</div><div style="font-size:14px;font-weight:700;color:#ff6b6b;margin-top:2px">「'+escH(r.telop)+'」</div></div><div><div class="ll" style="color:#2ed573">CTA（左下）</div><div style="font-size:12px;font-weight:600;color:#2ed573;margin-top:2px">'+escH(r.cta)+'</div></div></div>';
+  h+='<div class="speech-sec"><div class="ll">セリフ</div>';
+  [{l:"冒頭",t:r.speech1,c:"#ff6b6b"},{l:"中盤",t:r.speech2,c:"#ffa502"},{l:"締め",t:r.speech3,c:"#2ed573"}].forEach(function(x){
+    h+='<div class="speech-line"><span class="la" style="color:'+x.c+'">'+x.l+'</span><span class="tx">'+escH(x.t)+'</span></div>';
+  });
+  h+='</div></div>';
+
+  // Grok video prompts
+  h+='<div class="sec-title">動画プロンプト（Grokに貼り付け）</div>';
+  h+=box('PART1','フック(0-10秒)',r.prompt1,'#ff6b6b',1);
+  h+=box('PART2','使用シーン(10-20秒)',r.prompt2,'#ffa502',2);
+  h+=box('PART3','CTA(20-30秒)',r.prompt3,'#2ed573',3);
+  h+='<button class="regen" onclick="generate()">別パターンで再生成</button>';
+
+  var el=document.getElementById('results');
+  el.style.display='block';el.innerHTML=h;
+  // scroll to results
+  el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function box(label,sub,content,color,idx){
+  var esc=escH(content);
+  return '<div class="copy-box" style="background:'+color+'11;border:1px solid '+color+'33">'+
+    '<div class="copy-hdr"><div class="left"><span class="tag" style="background:'+color+'">'+label+'</span><span class="sub">'+sub+'</span></div>'+
+    '<button class="copy-btn" style="background:rgba(255,255,255,0.08);color:#aaa" onclick="copyText(document.getElementById(\'pre'+idx+'\').textContent,this)">コピー</button></div>'+
+    '<pre class="copy-pre" id="pre'+idx+'">'+esc+'</pre></div>';
+
+}
+
+function boxWithImgGen(label,sub,content,color,idx){
+var esc=escH(content);
+return ‘<div class="copy-box" style="background:'+color+'11;border:1px solid '+color+'33">’+
+‘<div class="copy-hdr"><div class="left"><span class="tag" style="background:'+color+'">’+label+’</span><span class="sub">’+sub+’</span></div>’+
+‘<button class="copy-btn" style="background:rgba(255,255,255,0.08);color:#aaa" onclick="copyText(document.getElementById(\'pre'+idx+'\').textContent,this)">コピー</button></div>’+
+‘<pre class="copy-pre" id="pre'+idx+'">’+esc+’</pre>’+
+‘<div id="imgarea-pre'+idx+'" class="gen-img-area"></div>’+
+‘<button id="imgbtn-pre'+idx+'" class="gen-img-btn" onclick="generateImage(\'pre'+idx+'\')">🎨 Geminiで画像を生成</button>’+
+‘</div>’;
+}
+
+function generate(){
+if(!state.pn.trim()||state.aiLoading||!getApiKey())return;
+state.busy=true;updateBtn();
+setTimeout(function(){var r=makePrompts();renderResults(r);state.busy=false;updateBtn();},100);
+}
+
+// ===== SAVE/RESTORE API KEY =====
+function saveApiKey(key){
+try{localStorage.setItem(‘gemini_api_key’,key);}catch(e){}
+}
+function loadApiKey(){
+try{return localStorage.getItem(‘gemini_api_key’)||’’;}catch(e){return ‘’;}
+}
+
+// ===== INIT =====
+renderImg(‘inf-area’,null,‘inf-input’);
+renderImg(‘prod-area’,null,‘prod-input’);
+
+// Restore API key
+var savedKey=loadApiKey();
+if(savedKey)document.getElementById(‘api-key’).value=savedKey;
+
+document.getElementById(‘api-key’).addEventListener(‘input’,function(e){
+saveApiKey(e.target.value);updateBtn();
+});
+
+document.getElementById(‘inf-input’).addEventListener(‘change’,function(e){
+var f=e.target.files[0];if(!f)return;
+var r=new FileReader();r.onloadend=function(){state.infImg=r.result;renderImg(‘inf-area’,r.result,‘inf-input’);};r.readAsDataURL(f);
+});
+document.getElementById(‘prod-input’).addEventListener(‘change’,function(e){
+var f=e.target.files[0];if(!f)return;
+var r=new FileReader();r.onloadend=function(){
+state.prodImg=r.result;state.prodB64=r.result;
+renderImg(‘prod-area’,r.result,‘prod-input’);
+if(state.pn.trim())runAI(state.pn.trim(),r.result);
+};r.readAsDataURL(f);
+});
+document.getElementById(‘pn-input’).addEventListener(‘input’,function(e){
+state.pn=e.target.value;updateBtn();clearTimeout(timer);
+if(state.pn.trim().length>=2){timer=setTimeout(function(){runAI(state.pn.trim(),state.prodB64);},1200);}
+});
+document.getElementById(‘sn-input’).addEventListener(‘input’,function(e){state.sn=e.target.value;});
+document.getElementById(‘style-sel’).addEventListener(‘change’,function(e){state.st=e.target.value;});
+document.getElementById(‘gen-btn’).addEventListener(‘click’,generate);
+</script>
+
+</body>
+</html>
