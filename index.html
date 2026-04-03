@@ -7,7 +7,7 @@
 <title>Grok Prompt Generator</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{background:#0a0a0f;color:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Hiragino Kaku Gothic ProN',sans-serif;min-height:100vh;min-height:-webkit-fill-available}
+body{background:#0a0a0f;color:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Hiragino Kaku Gothic ProN',sans-serif;min-height:100vh}
 
 .hdr{background:linear-gradient(135deg,#1a1a2e,#0f3460);padding:24px 16px 20px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.06)}
 .hdr .sub{font-size:9px;font-weight:700;letter-spacing:3px;color:#ff6b6b;text-transform:uppercase;margin-bottom:6px}
@@ -15,7 +15,7 @@ body{background:#0a0a0f;color:#f5f5f7;font-family:-apple-system,BlinkMacSystemFo
 .hdr p{font-size:11px;color:#888;margin-top:6px}
 
 .api-bar{margin:12px 14px;padding:12px;background:rgba(168,85,247,0.06);border:1px solid rgba(168,85,247,0.2);border-radius:12px}
-.api-bar .lbl{font-size:10px;font-weight:700;color:#a855f7;margin-bottom:4px;display:block}
+.api-bar .al{font-size:10px;font-weight:700;color:#a855f7;margin-bottom:4px;display:block}
 .api-bar input{width:100%;padding:8px 10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#f5f5f7;font-size:12px;outline:none;font-family:monospace}
 .api-bar .hint{font-size:9px;color:#777;margin-top:4px}
 .api-bar .hint a{color:#a855f7;text-decoration:none}
@@ -25,64 +25,66 @@ body{background:#0a0a0f;color:#f5f5f7;font-family:-apple-system,BlinkMacSystemFo
 
 .rule{margin:12px 14px;padding:14px;background:rgba(255,107,107,0.05);border:1px solid rgba(255,107,107,0.15);border-radius:12px}
 .rule-title{font-size:10px;font-weight:700;color:#ff6b6b;margin-bottom:6px}
-.rule-row{display:-webkit-flex;display:flex;gap:6px}
-.rule-card{-webkit-flex:1;flex:1;background:rgba(0,0,0,0.3);border-radius:8px;padding:8px 4px;text-align:center}
+.rule-row{display:flex;gap:6px}
+.rule-card{flex:1;background:rgba(0,0,0,0.3);border-radius:8px;padding:8px 4px;text-align:center}
 .rule-card .t{font-size:9px;color:#ff6b6b;font-weight:700}
 .rule-card .r{font-size:11px;font-weight:700;margin:2px 0}
 .rule-card .d{font-size:8px;color:#777}
 
 .wrap{padding:14px}
-.imgs{display:-webkit-flex;display:flex;gap:10px;margin-bottom:14px}
-.img-slot{-webkit-flex:1;flex:1}
+.imgs{display:flex;gap:10px;margin-bottom:14px}
+.img-slot{flex:1}
 .img-slot-label{font-size:10px;font-weight:600;color:#999;display:block;margin-bottom:4px}
 .img-slot-label .badge{color:#ffa502;font-size:9px}
 
-.img-prev{position:relative;height:100px;border-radius:10px;overflow:hidden;border:1px solid rgba(255,107,107,0.3)}
+/* Static upload area using label+input */
+.upload-wrap{position:relative;width:100%;height:100px;border-radius:10px;overflow:hidden}
+.upload-label{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100px;background:rgba(255,255,255,0.04);border:2px dashed rgba(255,255,255,0.15);border-radius:10px;color:#888;font-size:22px;cursor:pointer}
+.upload-label span{font-size:10px;color:#666;margin-top:2px}
+.upload-label input{position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:100px}
+
+.img-prev{position:relative;width:100%;height:100px;border-radius:10px;overflow:hidden;border:1px solid rgba(255,107,107,0.3);display:none}
 .img-prev img{width:100%;height:100%;object-fit:cover}
-.img-del-btn{position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.8);border:none;color:#ff6b6b;border-radius:50%;width:28px;height:28px;font-size:14px;cursor:pointer;z-index:10;line-height:1}
+.img-del{position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.8);border:none;color:#ff6b6b;border-radius:50%;width:28px;height:28px;font-size:14px;cursor:pointer;z-index:10}
 
 .lbl{font-size:11px;font-weight:600;color:#999;display:block;margin-bottom:4px}
 input[type=text],select{width:100%;padding:10px 12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#f5f5f7;font-size:13px;outline:none;-webkit-appearance:none;appearance:none}
 .mb{margin-bottom:14px}
 .ai-status{margin-top:6px;font-size:11px;color:#ffa502}
-.sn-row{margin-top:6px;display:-webkit-flex;display:flex;-webkit-align-items:center;align-items:center;gap:6px;-webkit-flex-wrap:wrap;flex-wrap:wrap}
+.sn-row{margin-top:6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .sn-row .tag{font-size:12px;font-weight:700;color:#a855f7;background:rgba(168,85,247,0.1);padding:2px 8px;border-radius:6px}
-.sn-row input{-webkit-flex:1;flex:1;min-width:60px;padding:3px 6px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#f5f5f7;font-size:11px;outline:none}
+.sn-row input{flex:1;min-width:60px;padding:3px 6px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#f5f5f7;font-size:11px;outline:none}
 .scene-info{margin-top:4px;font-size:10px;color:#ffa502}
 .merit-info{margin-top:4px;font-size:10px;color:#2ed573;background:rgba(46,213,115,0.07);border-radius:6px;padding:4px 8px;display:none}
-.gen-btn{width:100%;padding:13px;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;-webkit-transition:all 0.3s;transition:all 0.3s}
+.gen-btn{width:100%;padding:13px;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.3s}
 .gen-btn.on{background:linear-gradient(135deg,#ff6b6b,#ee5a24);color:#fff}
 .gen-btn.off{background:rgba(255,255,255,0.05);color:#555;cursor:default}
 
 .results{padding:16px 14px 40px}
-
 .img-prompt-sec{background:rgba(168,85,247,0.07);border:2px solid rgba(168,85,247,0.35);border-radius:14px;padding:16px;margin-bottom:16px}
-.img-prompt-hdr{display:-webkit-flex;display:flex;-webkit-justify-content:space-between;justify-content:space-between;-webkit-align-items:center;align-items:center;margin-bottom:10px}
+.img-prompt-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
 .img-prompt-hdr .tt{font-size:12px;font-weight:700;color:#a855f7}
 .img-prompt-hdr .step{font-size:10px;color:#888;background:rgba(255,255,255,0.05);padding:3px 8px;border-radius:6px}
 .gemini-hint{font-size:10px;color:#a855f7;background:rgba(168,85,247,0.1);border-radius:8px;padding:8px 10px;margin-bottom:10px;line-height:1.5}
 .gemini-hint b{color:#c084fc}
-
 .gen-img-area{margin:10px 0;text-align:center}
 .gen-img-area img{max-width:100%;max-height:300px;border-radius:12px;border:2px solid rgba(168,85,247,0.3)}
-.gen-img-btn{width:100%;padding:10px;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;margin-top:8px;background:linear-gradient(135deg,#a855f7,#7c3aed);color:#fff;-webkit-transition:all 0.3s;transition:all 0.3s}
+.gen-img-btn{width:100%;padding:10px;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;margin-top:8px;background:linear-gradient(135deg,#a855f7,#7c3aed);color:#fff;transition:all 0.3s}
 .gen-img-btn:disabled{opacity:0.4;cursor:default}
 .gen-img-btn.loading{background:rgba(168,85,247,0.3);color:#a855f7}
-.gen-img-dl{display:inline-block;margin-top:6px;padding:6px 16px;background:rgba(46,213,115,0.15);color:#2ed573;border:1px solid rgba(46,213,115,0.3);border-radius:8px;font-size:11px;font-weight:600;text-decoration:none;cursor:pointer}
-
+.gen-img-dl{display:inline-block;margin-top:6px;padding:6px 16px;background:rgba(46,213,115,0.15);color:#2ed573;border:1px solid rgba(46,213,115,0.3);border-radius:8px;font-size:11px;font-weight:600;text-decoration:none}
 .preview{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px 14px;margin-bottom:14px}
-.prev-row{display:-webkit-flex;display:flex;gap:10px;margin-bottom:10px}
-.prev-row>div{-webkit-flex:1;flex:1}
+.prev-row{display:flex;gap:10px;margin-bottom:10px}
+.prev-row>div{flex:1}
 .prev-row .ll{font-size:8px;font-weight:700;margin-bottom:2px}
 .speech-sec{border-top:1px solid rgba(255,255,255,0.06);padding-top:8px}
 .speech-sec .ll{font-size:8px;font-weight:700;color:#a855f7;margin-bottom:4px}
-.speech-line{display:-webkit-flex;display:flex;gap:6px;margin-bottom:4px}
+.speech-line{display:flex;gap:6px;margin-bottom:4px}
 .speech-line .la{font-size:9px;font-weight:700;min-width:24px}
 .speech-line .tx{font-size:11px;color:#ccc;line-height:1.4}
-
 .copy-box{border-radius:14px;padding:16px;margin-bottom:14px}
-.copy-hdr{display:-webkit-flex;display:flex;-webkit-justify-content:space-between;justify-content:space-between;-webkit-align-items:center;align-items:center;margin-bottom:10px}
-.copy-hdr .left{display:-webkit-flex;display:flex;-webkit-align-items:center;align-items:center;gap:8px}
+.copy-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.copy-hdr .left{display:flex;align-items:center;gap:8px}
 .copy-hdr .tag{color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px}
 .copy-hdr .sub{color:#888;font-size:11px}
 .copy-btn{border:none;border-radius:8px;padding:5px 14px;font-size:11px;font-weight:600;cursor:pointer}
@@ -101,7 +103,7 @@ input[type=text],select{width:100%;padding:10px 12px;background:rgba(255,255,255
 </div>
 
 <div class="api-bar">
-  <label class="lbl" style="color:#a855f7">🔑 Gemini API Key</label>
+  <div class="al">🔑 Gemini API Key</div>
   <input type="text" id="api-key" placeholder="AIzaSy..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
   <div class="hint">👉 <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com/apikey</a> で無料取得</div>
   <div id="api-status" class="api-status"></div>
@@ -118,15 +120,35 @@ input[type=text],select{width:100%;padding:10px 12px;background:rgba(255,255,255
 
 <div class="wrap">
   <div class="imgs">
+    <!-- Influencer image -->
     <div class="img-slot">
       <div class="img-slot-label">👩 インフルエンサー <span class="badge" id="inf-badge"></span></div>
-      <div id="inf-area"></div>
-      <input type="file" id="inf-file" accept="image/*" style="position:absolute;left:-9999px;opacity:0;width:1px;height:1px;">
+      <div class="upload-wrap" id="inf-upload">
+        <label class="upload-label">
+          👩
+          <span>タップして選択</span>
+          <input type="file" accept="image/*" id="inf-file">
+        </label>
+      </div>
+      <div class="img-prev" id="inf-prev">
+        <img id="inf-img" src="" alt="">
+        <button type="button" class="img-del" id="inf-del">✕</button>
+      </div>
     </div>
+    <!-- Product image -->
     <div class="img-slot">
       <div class="img-slot-label">📦 商品画像</div>
-      <div id="prod-area"></div>
-      <input type="file" id="prod-file" accept="image/*" style="position:absolute;left:-9999px;opacity:0;width:1px;height:1px;">
+      <div class="upload-wrap" id="prod-upload">
+        <label class="upload-label">
+          📦
+          <span>タップして選択</span>
+          <input type="file" accept="image/*" id="prod-file">
+        </label>
+      </div>
+      <div class="img-prev" id="prod-prev">
+        <img id="prod-img" src="" alt="">
+        <button type="button" class="img-del" id="prod-del">✕</button>
+      </div>
     </div>
   </div>
 
@@ -180,9 +202,8 @@ var STYLES_EN={
 var state={pn:"",sn:"",st:"大人キレイ系",infImg:null,prodImg:null,prodB64:null,sp:null,aiLoading:false,busy:false};
 var timer=null;
 
-function getApiKey(){return (document.getElementById('api-key').value||'').trim();}
+function getApiKey(){return(document.getElementById('api-key').value||'').trim();}
 
-// ===== GEMINI API =====
 async function callGemini(prompt,imgB64){
   var key=getApiKey();
   if(!key)throw new Error('Gemini API Keyを入力してください');
@@ -195,11 +216,7 @@ async function callGemini(prompt,imgB64){
   }
   parts.push({text:prompt});
   var url='https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key='+key;
-  var r=await fetch(url,{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({contents:[{parts:parts}],generationConfig:{temperature:0.9,maxOutputTokens:1024}})
-  });
+  var r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:parts}],generationConfig:{temperature:0.9,maxOutputTokens:1024}})});
   var d=await r.json();
   if(d.error)throw new Error(d.error.message||JSON.stringify(d.error));
   if(!d.candidates||!d.candidates[0])throw new Error('レスポンスが空です');
@@ -217,97 +234,52 @@ async function callGeminiImage(prompt,refImgB64){
   }
   parts.push({text:prompt});
   var url='https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key='+key;
-  var r=await fetch(url,{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      contents:[{parts:parts}],
-      generationConfig:{responseModalities:["TEXT","IMAGE"],temperature:1.0,maxOutputTokens:1024}
-    })
-  });
+  var r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:parts}],generationConfig:{responseModalities:["TEXT","IMAGE"],temperature:1.0,maxOutputTokens:1024}})});
   var d=await r.json();
   if(d.error)throw new Error(d.error.message||JSON.stringify(d.error));
   if(!d.candidates||!d.candidates[0])throw new Error('画像生成に失敗しました');
-  var resParts=d.candidates[0].content.parts;
-  for(var i=0;i<resParts.length;i++){
-    if(resParts[i].inlineData){
-      return 'data:'+resParts[i].inlineData.mimeType+';base64,'+resParts[i].inlineData.data;
-    }
-  }
+  var rp=d.candidates[0].content.parts;
+  for(var i=0;i<rp.length;i++){if(rp[i].inlineData)return'data:'+rp[i].inlineData.mimeType+';base64,'+rp[i].inlineData.data;}
   throw new Error('画像データが返されませんでした');
 }
 
-// ===== AI ANALYSIS =====
 function runAI(name,imgB64){
   if(!name||name.length<2)return;
-  if(!getApiKey()){
-    document.getElementById('ai-status').style.display='block';
-    document.getElementById('ai-status').textContent='⚠️ Gemini API Keyを入力してください';
-    return;
-  }
+  if(!getApiKey()){document.getElementById('ai-status').style.display='block';document.getElementById('ai-status').textContent='⚠️ Gemini API Keyを入力してください';return;}
   state.aiLoading=true;updateBtn();
   document.getElementById('ai-status').style.display='block';
   document.getElementById('ai-status').textContent='🔍 Gemini分析中...';
   document.getElementById('merit-info').style.display='none';
-
-  var prompt=[
-    "JSONのみ回答。Markdownコードブロック不要。余計な説明不要。",
-    "商品名:「"+name+"」",
-    "",
-    "Task1 shortName: 2〜8文字に簡略化。修飾語・スペック・記号を全削除。",
-    "Task2 category: food/beauty/health/gadget/home/fashion/other から1つ",
-    "Task3 keyMerit: 商品名から読み取れる最大の特徴を具体的に",
-    "Task4 usageScene: 商品を使う自然なシーン1文",
-    "Task5 セリフ3本（shortNameのみ使用/タメ口女の子語尾/keyMeritの具体ワードを必ず入れる）",
-    "禁止ワード: やばい・すごい・まじで・色々試した・効果が本当に・もう手放せない・実際使ってみたら・概念が変わった",
-    "hook(25〜45字): 商品の特徴→「〜見て？」「〜知ってた？」「〜分かる？」で終わる",
-    "merit(30〜50字): keyMeritの体験を具体的に",
-    "close(20〜35字): 共感+説明欄誘導",
-    "",
-    "JSON: {\"shortName\":\"名\",\"category\":\"カテゴリ\",\"keyMerit\":\"魅力\",\"usageScene\":\"シーン\",\"hook\":\"セリフ\",\"merit\":\"セリフ\",\"close\":\"セリフ\"}"
-  ].join("\n");
-
-  callGemini(prompt,imgB64)
-    .then(function(raw){
-      var clean=raw.replace(/```json\n?|```/g,'').trim();
-      var m=clean.match(/\{[\s\S]*\}/);if(m)clean=m[0];
-      try{
-        var p=JSON.parse(clean);
-        if(p.shortName){state.sn=p.shortName;showSN();}
-        if(p.hook||p.merit||p.close){state.sp={hook:p.hook||'',merit:p.merit||'',close:p.close||'',usageScene:p.usageScene||''};}
-        if(p.usageScene){document.getElementById('scene-info').style.display='block';document.getElementById('scene-info').textContent='🎬 '+p.usageScene;}
-        if(p.keyMerit){var mEl=document.getElementById('merit-info');mEl.style.display='block';mEl.textContent='✨ 訴求ポイント: '+p.keyMerit;}
-        var apiSt=document.getElementById('api-status');
-        apiSt.className='api-status ok';apiSt.textContent='✅ API接続OK';apiSt.style.display='block';
-      }catch(e){console.error('parse',e,clean);}
-      state.aiLoading=false;
-      document.getElementById('ai-status').style.display='none';
-      updateBtn();
-    })
-    .catch(function(e){
-      document.getElementById('ai-status').textContent='⚠️ '+e.message;
-      var apiSt=document.getElementById('api-status');
-      apiSt.className='api-status err';apiSt.textContent='❌ '+e.message;apiSt.style.display='block';
-      state.aiLoading=false;updateBtn();
-    });
+  var prompt="JSONのみ回答。Markdownコードブロック不要。余計な説明不要。\n商品名:「"+name+"」\n\nTask1 shortName: 2〜8文字に簡略化。修飾語・スペック・記号を全削除。\nTask2 category: food/beauty/health/gadget/home/fashion/other から1つ\nTask3 keyMerit: 商品名から読み取れる最大の特徴を具体的に\nTask4 usageScene: 商品を使う自然なシーン1文\nTask5 セリフ3本（shortNameのみ使用/タメ口女の子語尾/keyMeritの具体ワードを必ず入れる）\n禁止ワード: やばい・すごい・まじで・色々試した・効果が本当に・もう手放せない・実際使ってみたら・概念が変わった\nhook(25〜45字): 商品の特徴→「〜見て？」「〜知ってた？」「〜分かる？」で終わる\nmerit(30〜50字): keyMeritの体験を具体的に\nclose(20〜35字): 共感+説明欄誘導\n\nJSON: {\"shortName\":\"名\",\"category\":\"カテゴリ\",\"keyMerit\":\"魅力\",\"usageScene\":\"シーン\",\"hook\":\"セリフ\",\"merit\":\"セリフ\",\"close\":\"セリフ\"}";
+  callGemini(prompt,imgB64).then(function(raw){
+    var clean=raw.replace(/```json\n?|```/g,'').trim();
+    var m=clean.match(/\{[\s\S]*\}/);if(m)clean=m[0];
+    try{
+      var p=JSON.parse(clean);
+      if(p.shortName){state.sn=p.shortName;showSN();}
+      if(p.hook||p.merit||p.close){state.sp={hook:p.hook||'',merit:p.merit||'',close:p.close||'',usageScene:p.usageScene||''};}
+      if(p.usageScene){document.getElementById('scene-info').style.display='block';document.getElementById('scene-info').textContent='🎬 '+p.usageScene;}
+      if(p.keyMerit){var mEl=document.getElementById('merit-info');mEl.style.display='block';mEl.textContent='✨ 訴求ポイント: '+p.keyMerit;}
+      var as=document.getElementById('api-status');as.className='api-status ok';as.textContent='✅ API接続OK';as.style.display='block';
+    }catch(e){console.error('parse',e,clean);}
+    state.aiLoading=false;document.getElementById('ai-status').style.display='none';updateBtn();
+  }).catch(function(e){
+    document.getElementById('ai-status').textContent='⚠️ '+e.message;
+    var as=document.getElementById('api-status');as.className='api-status err';as.textContent='❌ '+e.message;as.style.display='block';
+    state.aiLoading=false;updateBtn();
+  });
 }
 
 function makeImagePrompt(){
-  var d=state.sn||'product';
-  var se=STYLES_EN[state.st]||STYLES_EN['大人キレイ系'];
-  var ir=state.infImg?'IMPORTANT: Use the person in the reference photo as the model, reproduce their face, hair and body exactly. ':'';
-  var pr=state.prodImg?'The product in the reference photo should appear in her hand, reproduce its design, color and shape accurately. ':'';
-  return 'Photorealistic vertical portrait photo, 9:16 aspect ratio, 1080x1920px.\n'+ir+pr+
-    'Subject: '+se+'. She holds '+d+' near her chest, looking at camera with a charming confident smile.\n'+
-    'Composition: upper body to thighs, subject slightly left of center, product on right side, 20% empty space at top.\n'+
-    'Background: bright indoor, white or beige wall, natural window light, beautiful soft bokeh.\n'+
-    'Lighting: soft warm cinematic light, shallow depth of field.\n'+
-    'Quality: ultra-high resolution, photorealistic, 4K, magazine quality. First frame of TikTok video.';
+  var d=state.sn||'product';var se=STYLES_EN[state.st]||STYLES_EN['大人キレイ系'];
+  var ir=state.infImg?'IMPORTANT: Use the person in the reference photo as the model. ':'';
+  var pr=state.prodImg?'The product in the reference photo should appear in her hand. ':'';
+  return'Photorealistic vertical portrait photo, 9:16 aspect ratio, 1080x1920px.\n'+ir+pr+'Subject: '+se+'. She holds '+d+' near her chest, looking at camera with a charming confident smile.\nComposition: upper body to thighs, subject slightly left of center, product on right side, 20% empty space at top.\nBackground: bright indoor, white or beige wall, natural window light, beautiful soft bokeh.\nLighting: soft warm cinematic light, shallow depth of field.\nQuality: ultra-high resolution, photorealistic, 4K, magazine quality. First frame of TikTok video.';
 }
 
 function makePrompts(){
-  var d=state.sn||'これ';var pn=state.pn;var st=state.st;var sp=state.sp;
-  var telop=pick(TELOPS);var cta=pick(CTAS);
+  var d=state.sn||'これ',pn=state.pn,st=state.st,sp=state.sp;
+  var telop=pick(TELOPS),cta=pick(CTAS);
   var s1=(sp&&sp.hook)||'これが気になりすぎて試してみたから見て？';
   var s2=(sp&&sp.merit)||'使い始めて分かったんだけど、全然違ったの。';
   var s3=(sp&&sp.close)||'気になった人は説明欄からチェックしてみて。';
@@ -319,58 +291,50 @@ function makePrompts(){
   var p1='Generate a 10-second vertical video (9:16).\n\nScene: '+sd+' が画面に向かって語りかけている。おしゃれな服装。明るい室内。\n\nSpeech: 「'+s1+'」\n驚きから笑顔へ。髪をかき上げる仕草。\n\nTelop: 「'+telop+'」を画面中央上部に大きく表示。太ゴシック白文字黒縁取り。\n\nStyle: Cinematic, soft lighting, shallow DOF, warm. 9:16, photorealistic.'+inf+pr+ref;
   var p2='Generate a 10-second vertical video (9:16).\n\nScene: '+sd+' が「'+d+'」を使用中。\n使用シーン: '+us+'\n\nAction:\n1. (0-3s) 商品を手に取る\n2. (3-7s) 実際に使用中クローズアップ\n3. (7-10s) 満足リアクション\n\nSpeech: 「'+s2+'」\nTelop: なし。9:16, photorealistic.'+inf+pr+ref;
   var p3='Generate a 10-second vertical video (9:16).\n\nScene: '+sd+' が「'+d+'」を手に持ち甘い笑顔。背景ボケ。\n\nSpeech: 「'+s3+'」\n最後にウィンク。商品を胸元の高さに。\n\nTelop: 画面左下に「'+cta+'」を最後3秒のみ。小さめ白文字。\nStyle: Golden hour, bokeh. 9:16, photorealistic.'+inf+pr+ref;
-  var pt=makeImagePrompt();
-  return{promptThumb:pt,prompt1:p1,prompt2:p2,prompt3:p3,telop:telop,speech1:s1,speech2:s2,speech3:s3,cta:cta};
+  return{promptThumb:makeImagePrompt(),prompt1:p1,prompt2:p2,prompt3:p3,telop:telop,speech1:s1,speech2:s2,speech3:s3,cta:cta};
 }
 
-// ===== IMAGE UPLOAD =====
-function showEmpty(areaId,type){
-  var isInf=(type==='inf');
-  var area=document.getElementById(areaId);
-  var btn=document.createElement('button');
-  btn.type='button';
-  btn.style.cssText='display:block;width:100%;height:100px;background:rgba(255,255,255,0.04);border:2px dashed rgba(255,255,255,0.15);border-radius:10px;color:#888;font-size:13px;font-weight:600;cursor:pointer;-webkit-appearance:none;appearance:none;';
-  btn.innerHTML=(isInf?'👩':'📦')+'<br><span style="font-size:10px;color:#666">タップして選択</span>';
-  btn.addEventListener('click',function(){
-    document.getElementById(isInf?'inf-file':'prod-file').click();
-  });
-  area.innerHTML='';
-  area.appendChild(btn);
-}
-
-function showPreview(areaId,imgSrc,type){
-  var area=document.getElementById(areaId);
-  area.innerHTML='<div class="img-prev"><img src="'+imgSrc+'"><button type="button" class="img-del-btn">✕</button></div>';
-  area.querySelector('.img-del-btn').addEventListener('click',function(){
-    if(type==='inf'){state.infImg=null;document.getElementById('inf-badge').textContent='';showEmpty('inf-area','inf');}
-    else{state.prodImg=null;state.prodB64=null;showEmpty('prod-area','prod');}
-  });
-  if(type==='inf')document.getElementById('inf-badge').textContent='(固定中)';
-}
-
-// File input handlers
+// ===== IMAGE HANDLING (all static HTML, no dynamic creation) =====
 document.getElementById('inf-file').addEventListener('change',function(){
   var f=this.files[0];if(!f)return;
-  var reader=new FileReader();
-  reader.onload=function(e){
+  var r=new FileReader();
+  r.onload=function(e){
     state.infImg=e.target.result;
-    showPreview('inf-area',e.target.result,'inf');
+    document.getElementById('inf-img').src=e.target.result;
+    document.getElementById('inf-upload').style.display='none';
+    document.getElementById('inf-prev').style.display='block';
+    document.getElementById('inf-badge').textContent='(固定中)';
   };
-  reader.readAsDataURL(f);
-  this.value='';
+  r.readAsDataURL(f);
 });
 
 document.getElementById('prod-file').addEventListener('change',function(){
   var f=this.files[0];if(!f)return;
-  var reader=new FileReader();
-  reader.onload=function(e){
+  var r=new FileReader();
+  r.onload=function(e){
     state.prodImg=e.target.result;
     state.prodB64=e.target.result;
-    showPreview('prod-area',e.target.result,'prod');
+    document.getElementById('prod-img').src=e.target.result;
+    document.getElementById('prod-upload').style.display='none';
+    document.getElementById('prod-prev').style.display='block';
     if(state.pn.trim())runAI(state.pn.trim(),e.target.result);
   };
-  reader.readAsDataURL(f);
-  this.value='';
+  r.readAsDataURL(f);
+});
+
+document.getElementById('inf-del').addEventListener('click',function(){
+  state.infImg=null;
+  document.getElementById('inf-prev').style.display='none';
+  document.getElementById('inf-upload').style.display='block';
+  document.getElementById('inf-badge').textContent='';
+  document.getElementById('inf-file').value='';
+});
+
+document.getElementById('prod-del').addEventListener('click',function(){
+  state.prodImg=null;state.prodB64=null;
+  document.getElementById('prod-prev').style.display='none';
+  document.getElementById('prod-upload').style.display='block';
+  document.getElementById('prod-file').value='';
 });
 
 function updateBtn(){
@@ -388,25 +352,19 @@ function showSN(){
   document.getElementById('sn-input').value=state.sn;
 }
 
-// Safari-compatible copy
 function copyText(text,btnEl){
   if(navigator.clipboard&&navigator.clipboard.writeText){
     navigator.clipboard.writeText(text).then(function(){showCopied(btnEl);}).catch(function(){fallbackCopy(text,btnEl);});
   }else{fallbackCopy(text,btnEl);}
 }
 function fallbackCopy(text,btnEl){
-  var ta=document.createElement('textarea');
-  ta.value=text;ta.style.cssText='position:fixed;left:-9999px;top:-9999px;opacity:0';
+  var ta=document.createElement('textarea');ta.value=text;ta.style.cssText='position:fixed;left:-9999px;top:-9999px;opacity:0';
   document.body.appendChild(ta);ta.focus();ta.setSelectionRange(0,ta.value.length);
   var ok=false;try{ok=document.execCommand('copy');}catch(e){}
   document.body.removeChild(ta);
-  if(ok)showCopied(btnEl);
-  else{btnEl.textContent='長押しコピー';setTimeout(function(){btnEl.textContent='コピー';},2000);}
+  if(ok)showCopied(btnEl);else{btnEl.textContent='長押しコピー';setTimeout(function(){btnEl.textContent='コピー';},2000);}
 }
-function showCopied(btnEl){
-  btnEl.textContent='OK!';btnEl.style.background='#27ae60';btnEl.style.color='#fff';
-  setTimeout(function(){btnEl.textContent='コピー';btnEl.style.background='rgba(255,255,255,0.08)';btnEl.style.color='#aaa';},1500);
-}
+function showCopied(b){b.textContent='OK!';b.style.background='#27ae60';b.style.color='#fff';setTimeout(function(){b.textContent='コピー';b.style.background='rgba(255,255,255,0.08)';b.style.color='#aaa';},1500);}
 
 function generateImage(promptId){
   var prompt=document.getElementById(promptId).textContent;
@@ -414,86 +372,52 @@ function generateImage(promptId){
   var area=document.getElementById('imgarea-'+promptId);
   btn.disabled=true;btn.textContent='🎨 画像生成中...';btn.className='gen-img-btn loading';
   var refImg=state.infImg||state.prodImg||null;
-  callGeminiImage(prompt,refImg)
-    .then(function(dataUrl){
-      area.innerHTML='<img src="'+dataUrl+'" alt="Generated image">';
-      var dlBtn=document.createElement('a');
-      dlBtn.className='gen-img-dl';dlBtn.textContent='📥 画像をダウンロード';
-      dlBtn.href=dataUrl;dlBtn.download='tiktok-thumb-'+Date.now()+'.png';
-      area.appendChild(document.createElement('br'));area.appendChild(dlBtn);
-      btn.textContent='🔄 再生成';btn.className='gen-img-btn';btn.disabled=false;
-    })
-    .catch(function(e){
-      area.innerHTML='<div style="color:#ff6b6b;font-size:11px;padding:8px">⚠️ '+escH(e.message)+'</div>';
-      btn.textContent='🎨 リトライ';btn.className='gen-img-btn';btn.disabled=false;
-    });
+  callGeminiImage(prompt,refImg).then(function(dataUrl){
+    area.innerHTML='<img src="'+dataUrl+'" alt="Generated">';
+    var dl=document.createElement('a');dl.className='gen-img-dl';dl.textContent='📥 画像をダウンロード';dl.href=dataUrl;dl.download='tiktok-'+Date.now()+'.png';
+    area.appendChild(document.createElement('br'));area.appendChild(dl);
+    btn.textContent='🔄 再生成';btn.className='gen-img-btn';btn.disabled=false;
+  }).catch(function(e){
+    area.innerHTML='<div style="color:#ff6b6b;font-size:11px;padding:8px">⚠️ '+escH(e.message)+'</div>';
+    btn.textContent='🎨 リトライ';btn.className='gen-img-btn';btn.disabled=false;
+  });
 }
 
 function escH(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 
 function renderResults(r){
-  var h='';
-  h+='<div class="img-prompt-sec">';
-  h+='<div class="img-prompt-hdr"><span class="tt">🖼 冒頭画像プロンプト</span><span class="step">① Geminiで画像生成</span></div>';
-  h+='<div class="gemini-hint">👉 下の「画像を生成」ボタンで<b>Gemini API</b>から直接画像生成できます</div>';
-  h+=boxWithImgGen('IMAGE','Gemini用・冒頭フレーム',r.promptThumb,'#a855f7',0);
-  h+='</div>';
+  var h='<div class="img-prompt-sec"><div class="img-prompt-hdr"><span class="tt">🖼 冒頭画像プロンプト</span><span class="step">① Geminiで画像生成</span></div><div class="gemini-hint">👉 下の「画像を生成」ボタンで<b>Gemini API</b>から直接画像生成できます</div>'+boxImg('IMAGE','Gemini用・冒頭フレーム',r.promptThumb,'#a855f7',0)+'</div>';
   h+='<div class="preview"><div class="prev-row"><div><div class="ll" style="color:#ff6b6b">TELOP</div><div style="font-size:14px;font-weight:700;color:#ff6b6b;margin-top:2px">「'+escH(r.telop)+'」</div></div><div><div class="ll" style="color:#2ed573">CTA（左下）</div><div style="font-size:12px;font-weight:600;color:#2ed573;margin-top:2px">'+escH(r.cta)+'</div></div></div>';
   h+='<div class="speech-sec"><div class="ll">セリフ</div>';
-  [{l:"冒頭",t:r.speech1,c:"#ff6b6b"},{l:"中盤",t:r.speech2,c:"#ffa502"},{l:"締め",t:r.speech3,c:"#2ed573"}].forEach(function(x){
-    h+='<div class="speech-line"><span class="la" style="color:'+x.c+'">'+x.l+'</span><span class="tx">'+escH(x.t)+'</span></div>';
-  });
+  [{l:"冒頭",t:r.speech1,c:"#ff6b6b"},{l:"中盤",t:r.speech2,c:"#ffa502"},{l:"締め",t:r.speech3,c:"#2ed573"}].forEach(function(x){h+='<div class="speech-line"><span class="la" style="color:'+x.c+'">'+x.l+'</span><span class="tx">'+escH(x.t)+'</span></div>';});
   h+='</div></div>';
   h+='<div class="sec-title">動画プロンプト（Grokに貼り付け）</div>';
-  h+=box('PART1','フック(0-10秒)',r.prompt1,'#ff6b6b',1);
-  h+=box('PART2','使用シーン(10-20秒)',r.prompt2,'#ffa502',2);
-  h+=box('PART3','CTA(20-30秒)',r.prompt3,'#2ed573',3);
+  h+=box('PART1','フック(0-10秒)',r.prompt1,'#ff6b6b',1)+box('PART2','使用シーン(10-20秒)',r.prompt2,'#ffa502',2)+box('PART3','CTA(20-30秒)',r.prompt3,'#2ed573',3);
   h+='<button class="regen" onclick="generate()">別パターンで再生成</button>';
-  var el=document.getElementById('results');
-  el.style.display='block';el.innerHTML=h;
+  var el=document.getElementById('results');el.style.display='block';el.innerHTML=h;
   el.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 function box(label,sub,content,color,idx){
   var esc=escH(content);
-  return '<div class="copy-box" style="background:'+color+'11;border:1px solid '+color+'33">'+
-    '<div class="copy-hdr"><div class="left"><span class="tag" style="background:'+color+'">'+label+'</span><span class="sub">'+sub+'</span></div>'+
-    '<button class="copy-btn" style="background:rgba(255,255,255,0.08);color:#aaa" onclick="copyText(document.getElementById(\'pre'+idx+'\').textContent,this)">コピー</button></div>'+
-    '<pre class="copy-pre" id="pre'+idx+'">'+esc+'</pre></div>';
+  return'<div class="copy-box" style="background:'+color+'11;border:1px solid '+color+'33"><div class="copy-hdr"><div class="left"><span class="tag" style="background:'+color+'">'+label+'</span><span class="sub">'+sub+'</span></div><button class="copy-btn" style="background:rgba(255,255,255,0.08);color:#aaa" onclick="copyText(document.getElementById(\'pre'+idx+'\').textContent,this)">コピー</button></div><pre class="copy-pre" id="pre'+idx+'">'+esc+'</pre></div>';
 
 }
-
-function boxWithImgGen(label,sub,content,color,idx){
+function boxImg(label,sub,content,color,idx){
 var esc=escH(content);
-return ‘<div class="copy-box" style="background:'+color+'11;border:1px solid '+color+'33">’+
-‘<div class="copy-hdr"><div class="left"><span class="tag" style="background:'+color+'">’+label+’</span><span class="sub">’+sub+’</span></div>’+
-‘<button class="copy-btn" style="background:rgba(255,255,255,0.08);color:#aaa" onclick="copyText(document.getElementById(\'pre'+idx+'\').textContent,this)">コピー</button></div>’+
-‘<pre class="copy-pre" id="pre'+idx+'">’+esc+’</pre>’+
-‘<div id="imgarea-pre'+idx+'" class="gen-img-area"></div>’+
-‘<button id="imgbtn-pre'+idx+'" class="gen-img-btn" onclick="generateImage(\'pre'+idx+'\')">🎨 Geminiで画像を生成</button></div>’;
+return’<div class="copy-box" style="background:'+color+'11;border:1px solid '+color+'33"><div class="copy-hdr"><div class="left"><span class="tag" style="background:'+color+'">’+label+’</span><span class="sub">’+sub+’</span></div><button class="copy-btn" style="background:rgba(255,255,255,0.08);color:#aaa" onclick="copyText(document.getElementById(\'pre'+idx+'\').textContent,this)">コピー</button></div><pre class="copy-pre" id="pre'+idx+'">’+esc+’</pre><div id="imgarea-pre'+idx+'" class="gen-img-area"></div><button id="imgbtn-pre'+idx+'" class="gen-img-btn" onclick="generateImage(\'pre'+idx+'\')">🎨 Geminiで画像を生成</button></div>’;
 }
 
 function generate(){
 if(!state.pn.trim()||state.aiLoading||!getApiKey())return;
 state.busy=true;updateBtn();
-setTimeout(function(){var r=makePrompts();renderResults(r);state.busy=false;updateBtn();},100);
+setTimeout(function(){renderResults(makePrompts());state.busy=false;updateBtn();},100);
 }
 
-function saveApiKey(key){try{localStorage.setItem(‘gemini_api_key’,key);}catch(e){}}
-function loadApiKey(){try{return localStorage.getItem(‘gemini_api_key’)||’’;}catch(e){return ‘’;}}
-
-// ===== INIT =====
-showEmpty(‘inf-area’,‘inf’);
-showEmpty(‘prod-area’,‘prod’);
-
-var savedKey=loadApiKey();
-if(savedKey)document.getElementById(‘api-key’).value=savedKey;
-
-document.getElementById(‘api-key’).addEventListener(‘input’,function(e){saveApiKey(e.target.value);updateBtn();});
-document.getElementById(‘pn-input’).addEventListener(‘input’,function(e){
-state.pn=e.target.value;updateBtn();clearTimeout(timer);
-if(state.pn.trim().length>=2){timer=setTimeout(function(){runAI(state.pn.trim(),state.prodB64);},1200);}
-});
+// INIT
+try{var sk=localStorage.getItem(‘gemini_api_key’);if(sk)document.getElementById(‘api-key’).value=sk;}catch(e){}
+document.getElementById(‘api-key’).addEventListener(‘input’,function(e){try{localStorage.setItem(‘gemini_api_key’,e.target.value);}catch(ex){}updateBtn();});
+document.getElementById(‘pn-input’).addEventListener(‘input’,function(e){state.pn=e.target.value;updateBtn();clearTimeout(timer);if(state.pn.trim().length>=2){timer=setTimeout(function(){runAI(state.pn.trim(),state.prodB64);},1200);}});
 document.getElementById(‘sn-input’).addEventListener(‘input’,function(e){state.sn=e.target.value;});
 document.getElementById(‘style-sel’).addEventListener(‘change’,function(e){state.st=e.target.value;});
 document.getElementById(‘gen-btn’).addEventListener(‘click’,generate);
