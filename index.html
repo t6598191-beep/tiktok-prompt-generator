@@ -102,7 +102,7 @@ input[type=text],select{width:100%;padding:10px 12px;background:rgba(255,255,255
 
 <div class="api-bar">
   <div class="al">🔑 Gemini API Key</div>
-  <input type="text" id="api-key" placeholder="AIzaSy..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+  <input type="text" id="api-key" placeholder="AIzaSy..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" oninput="onApiKey(this.value)">
   <div class="hint">👉 <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com/apikey</a> で無料取得</div>
   <div id="api-status" class="api-status"></div>
 </div>
@@ -140,12 +140,12 @@ input[type=text],select{width:100%;padding:10px 12px;background:rgba(255,255,255
 
   <div class="mb">
     <div class="lbl">商品名（タイトル貼付）*</div>
-    <input type="text" id="pn-input" placeholder="例: パンケーキミックス ふわふわ 200g...">
+    <input type="text" id="pn-input" placeholder="例: パンケーキミックス ふわふわ 200g..." oninput="onPnInput(this.value)">
     <div id="ai-status" class="ai-status" style="display:none"></div>
     <div id="sn-row" class="sn-row" style="display:none">
       <span style="font-size:10px;color:#888">セリフ用:</span>
       <span class="tag" id="sn-tag"></span>
-      <input type="text" id="sn-input" placeholder="変更可">
+      <input type="text" id="sn-input" placeholder="変更可" oninput="state.sn=this.value">
     </div>
     <div id="scene-info" class="scene-info" style="display:none"></div>
     <div id="merit-info" class="merit-info"></div>
@@ -153,7 +153,7 @@ input[type=text],select{width:100%;padding:10px 12px;background:rgba(255,255,255
 
   <div class="mb">
     <div class="lbl">女性スタイル</div>
-    <select id="style-sel">
+    <select id="style-sel" onchange="state.st=this.value">
       <option value="清楚系">清楚系</option>
       <option value="大人キレイ系" selected>大人キレイ系</option>
       <option value="韓国系">韓国系</option>
@@ -161,7 +161,7 @@ input[type=text],select{width:100%;padding:10px 12px;background:rgba(255,255,255
     </select>
   </div>
 
-<button class="gen-btn off" id="gen-btn" disabled>🎬 プロンプト生成</button>
+<button class="gen-btn off" id="gen-btn" disabled onclick="generate()">🎬 プロンプト生成</button>
 
 </div>
 
@@ -404,13 +404,11 @@ state.busy=true;updateBtn();
 setTimeout(function(){renderResults(makePrompts());state.busy=false;updateBtn();},100);
 }
 
-// INIT
+// INIT - global handler functions
+function onApiKey(v){try{localStorage.setItem(‘gemini_api_key’,v);}catch(ex){}updateBtn();}
+function onPnInput(v){state.pn=v;updateBtn();clearTimeout(timer);if(v.trim().length>=2){timer=setTimeout(function(){runAI(v.trim(),state.prodB64);},1200);}}
+
 try{var sk=localStorage.getItem(‘gemini_api_key’);if(sk)document.getElementById(‘api-key’).value=sk;}catch(e){}
-document.getElementById(‘api-key’).addEventListener(‘input’,function(e){try{localStorage.setItem(‘gemini_api_key’,e.target.value);}catch(ex){}updateBtn();});
-document.getElementById(‘pn-input’).addEventListener(‘input’,function(e){state.pn=e.target.value;updateBtn();clearTimeout(timer);if(state.pn.trim().length>=2){timer=setTimeout(function(){runAI(state.pn.trim(),state.prodB64);},1200);}});
-document.getElementById(‘sn-input’).addEventListener(‘input’,function(e){state.sn=e.target.value;});
-document.getElementById(‘style-sel’).addEventListener(‘change’,function(e){state.st=e.target.value;});
-document.getElementById(‘gen-btn’).addEventListener(‘click’,generate);
 </script>
 
 </body>
