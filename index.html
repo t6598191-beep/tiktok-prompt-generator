@@ -127,12 +127,12 @@ input[type=text],select{width:100%;padding:10px 12px;background:rgba(255,255,255
         <label class="upload-label">
           👩
           <span>タップして選択</span>
-          <input type="file" accept="image/*" id="inf-file">
+          <input type="file" accept="image/*" id="inf-file" onchange="onInfFile(this)">
         </label>
       </div>
       <div class="img-prev" id="inf-prev">
         <img id="inf-img" src="" alt="">
-        <button type="button" class="img-del" id="inf-del">✕</button>
+        <button type="button" class="img-del" onclick="clearInf()">✕</button>
       </div>
     </div>
     <!-- Product image -->
@@ -142,12 +142,12 @@ input[type=text],select{width:100%;padding:10px 12px;background:rgba(255,255,255
         <label class="upload-label">
           📦
           <span>タップして選択</span>
-          <input type="file" accept="image/*" id="prod-file">
+          <input type="file" accept="image/*" id="prod-file" onchange="onProdFile(this)">
         </label>
       </div>
       <div class="img-prev" id="prod-prev">
         <img id="prod-img" src="" alt="">
-        <button type="button" class="img-del" id="prod-del">✕</button>
+        <button type="button" class="img-del" onclick="clearProd()">✕</button>
       </div>
     </div>
   </div>
@@ -294,9 +294,9 @@ function makePrompts(){
   return{promptThumb:makeImagePrompt(),prompt1:p1,prompt2:p2,prompt3:p3,telop:telop,speech1:s1,speech2:s2,speech3:s3,cta:cta};
 }
 
-// ===== IMAGE HANDLING (all static HTML, no dynamic creation) =====
-document.getElementById('inf-file').addEventListener('change',function(){
-  var f=this.files[0];if(!f)return;
+// ===== IMAGE HANDLING =====
+function onInfFile(input){
+  var f=input.files[0];if(!f)return;
   var r=new FileReader();
   r.onload=function(e){
     state.infImg=e.target.result;
@@ -306,10 +306,10 @@ document.getElementById('inf-file').addEventListener('change',function(){
     document.getElementById('inf-badge').textContent='(固定中)';
   };
   r.readAsDataURL(f);
-});
+}
 
-document.getElementById('prod-file').addEventListener('change',function(){
-  var f=this.files[0];if(!f)return;
+function onProdFile(input){
+  var f=input.files[0];if(!f)return;
   var r=new FileReader();
   r.onload=function(e){
     state.prodImg=e.target.result;
@@ -320,22 +320,22 @@ document.getElementById('prod-file').addEventListener('change',function(){
     if(state.pn.trim())runAI(state.pn.trim(),e.target.result);
   };
   r.readAsDataURL(f);
-});
+}
 
-document.getElementById('inf-del').addEventListener('click',function(){
+function clearInf(){
   state.infImg=null;
   document.getElementById('inf-prev').style.display='none';
   document.getElementById('inf-upload').style.display='block';
   document.getElementById('inf-badge').textContent='';
   document.getElementById('inf-file').value='';
-});
+}
 
-document.getElementById('prod-del').addEventListener('click',function(){
+function clearProd(){
   state.prodImg=null;state.prodB64=null;
   document.getElementById('prod-prev').style.display='none';
   document.getElementById('prod-upload').style.display='block';
   document.getElementById('prod-file').value='';
-});
+}
 
 function updateBtn(){
   var btn=document.getElementById('gen-btn');
